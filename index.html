@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMMORTAL_OSINTVAULT | Research & Intelligence Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --matrix-dark: #0d0d0d;
+            --matrix-darker: #050505;
+            --matrix-glow: #00ff41;
+            --cyber-cyan: #00f0ff;
+            --cyber-pink: #ff00aa;
+        }
+        body { font-family: 'Share Tech Mono', monospace; background-color: var(--matrix-darker); color: var(--matrix-green); }
+        .chart-container { position: relative; width: 100%; max-width: 100%; height: 300px; }
+        .tool-card { transition: all 0.2s ease; border: 1px solid #1a3a1a; background: linear-gradient(180deg, #0a1a0a 0%, #050d05 100%); }
+        .tool-card:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 30px rgba(0, 255, 65, 0.05); border-color: var(--matrix-green); }
+        
+        /* Matrix Rain Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 255, 65, 0.03) 50%, transparent 100%);
+        }
+        
+        /* Cyber Button */
+        .cyber-btn {
+            background: linear-gradient(45deg, #003a00 0%, #001a00 50%, #002a00 100%);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            text-shadow: 0 0 10px var(--matrix-glow);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(0, 255, 65, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.3), transparent);
+            animation: cyber-scan 3s infinite;
+        }
+        @keyframes cyber-scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        .cyber-btn:hover { 
+            background: linear-gradient(45deg, #004a00 0%, #002a00 50%, #003a00 100%);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5), inset 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+        
+        /* Instagram Gradient Animation */
+        .insta-btn {
+            background: linear-gradient(45deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
+            border: 1px solid var(--cyber-pink);
+            color: var(--cyber-pink);
+            text-shadow: 0 0 10px var(--cyber-pink);
+            background-size: 200% auto;
+            transition: 0.5s;
+        }
+        .insta-btn:hover { background-position: right center; box-shadow: 0 0 30px rgba(255, 0, 170, 0.5); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #00ff41; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00cc33; }
+        .category-btn.active { background-color: transparent; color: var(--matrix-green); border-color: var(--matrix-green); text-shadow: 0 0 10px var(--matrix-glow); box-shadow: 0 0 15px rgba(0, 255, 65, 0.3); }
+        
+        /* Glow Effects */
+        .glow-text { text-shadow: 0 0 10px var(--matrix-glow), 0 0 20px var(--matrix-glow), 0 0 30px var(--matrix-glow); }
+        .glow-border { border: 1px solid var(--matrix-green); box-shadow: 0 0 10px rgba(0, 255, 65, 0.3); }
+        
+        /* Scanline Effect */
+        .scanlines::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-black min-h-screen flex flex-col scanlines">
+    <div class="matrix-bg"></div>
+    <!-- Navigation / Header -->
+    <header class="bg-black text-[#00ff41] shadow-[0_0_30px_rgba(0,255,65,0.3)] border-b border-[#00ff41]/30 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-bold tracking-tight text-[#00ff41] uppercase glow-text" style="font-family: 'Orbitron', sans-serif;">IMMORTAL_<span class="text-white">OSINTVAULT</span></span>
+                <span class="bg-[#00ff41]/10 border border-[#00ff41] text-[#00ff41] text-xs px-2 py-1 rounded-full uppercase tracking-wide font-semibold">Pro</span>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#dashboard" class="hover:text-[#00ff41] transition-colors text-[#00ff41]/70 hover:text-[#00ff41] hover:shadow-[0_0_15px_rgba(0,255,65,0.5)]">Dashboard</a>
+                <a href="#tools" class="hover:text-[#00ff41] transition-colors text-[#00ff41]/70 hover:text-[#00ff41] hover:shadow-[0_0_15px_rgba(0,255,65,0.5)]">Tool Database</a>
+                <a href="#learning" class="hover:text-[#00ff41] transition-colors text-[#00ff41]/70 hover:text-[#00ff41] hover:shadow-[0_0_15px_rgba(0,255,65,0.5)]">Learning Hub</a>
+            </nav>
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-[#00ff41] hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 space-y-12">
+        <!-- Intro Section -->
+        <section id="dashboard" class="text-center max-w-4xl mx-auto mb-12">
+            <h1 class="text-4xl font-extrabold text-[#00ff41] mb-4 glow-text" style="font-family: 'Orbitron', sans-serif;">IMMORTAL OSINT COMMAND CENTER</h1>
+            <p class="text-lg text-[#00ff41]/60 leading-relaxed">
+                Welcome to the definitive interactive repository for digital investigation. 
+                This platform indexes top-tier tools for gathering, analyzing, and synthesizing publicly available information. 
+            </p>
+        </section>
+
+        <!-- Analytics Dashboard -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Context Box -->
+            <div class="bg-black p-6 rounded-xl border border-[#00ff41]/30 lg:col-span-3">
+                <h3 class="text-xl font-bold text-[#00ff41] mb-2 border-b pb-2 border-[#00ff41]/20">
+                    <i class="fas fa-chart-pie text-[#00ff41] mr-2"></i> The Intelligence Landscape
+                </h3>
+                <p class="text-sm text-[#00ff41]/50 mb-6">
+                    Effective OSINT requires a balanced approach. The charts below analyze our curated toolset, showing the distribution of capabilities across different domains.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Category Distribution Chart -->
+                    <div class="bg-[#00ff41]/5 p-4 rounded-lg border border-[#00ff41]/20">
+                        <h4 class="text-sm font-semibold text-[#00ff41] mb-4 text-center">Tools by Intelligence Domain</h4>
+                        <div class="chart-container mx-auto">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Difficulty Chart -->
+                    <div class="bg-[#00ff41]/5 p-4 rounded-lg border border-[#00ff41]/20">
+                        <h4 class="text-sm font-semibold text-[#00ff41] mb-4 text-center">Technical Complexity Analysis</h4>
+                        <div class="chart-container mx-auto">
+                            <canvas id="difficultyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tool Database Section -->
+        <section id="tools" class="scroll-mt-24">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-6 border-b border-[#00ff41]/20 pb-4">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-3xl font-bold text-[#00ff41] glow-text" style="font-family: 'Orbitron', sans-serif;">Tool Database</h2>
+                    <p class="text-[#00ff41]/50 mt-1">Search, filter, and access professional-grade reconnaissance utilities.</p>
+                </div>
+                
+                <!-- Search & Filter Controls -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-3 text-[#00ff41]/50"></i>
+                        <input type="text" id="searchInput" placeholder="Search tools..." 
+                            class="pl-10 pr-4 py-2 border border-[#00ff41]/30 rounded-lg focus:ring-2 focus:ring-[#00ff41] focus:border-[#00ff41] w-full sm:w-64 text-sm bg-black text-[#00ff41] placeholder-[#00ff41]/30 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap gap-2 mb-8" id="categoryFilters">
+                <button class="category-btn active px-4 py-2 rounded-full border border-[#00ff41] text-sm font-medium bg-[#00ff41]/10 text-[#00ff41] hover:bg-[#00ff41]/20 transition-colors" data-category="all">
+                    All Tools
+                </button>
+                <!-- Generated by JS -->
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="bg-black border-l-4 border-[#00ff41] p-4 mb-8 flex justify-between items-center rounded-r-lg">
+                <div>
+                    <span class="font-bold text-[#00ff41]" id="toolCount">0</span>
+                    <span class="text-[#00ff41]/60 text-sm ml-1">tools loaded in vault</span>
+                </div>
+                <div class="text-xs text-[#00ff41] font-medium">
+                    IMMORTAL VERIFIED
+                </div>
+            </div>
+
+            <!-- Tools Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="toolsGrid">
+                <!-- Cards injected via JS -->
+            </div>
+        </section>
+
+        <!-- Learning Hub / Tutorial -->
+        <section id="learning" class="bg-black text-[#00ff41] rounded-2xl p-8 lg:p-12 my-12 border border-[#00ff41]/30 overflow-hidden relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-[#00ff41] rounded-full mix-blend-multiply filter blur-3xl opacity-5 -mr-16 -mt-16"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-[#00f0ff] rounded-full mix-blend-multiply filter blur-3xl opacity-5 -ml-16 -mb-16"></div>
+            
+            <div class="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-block bg-[#00ff41]/10 border border-[#00ff41] text-xs font-bold px-3 py-1 rounded-full mb-4">ACADEMY</div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 glow-text" style="font-family: 'Orbitron', sans-serif;">Master the Art of OSINT</h2>
+                    <p class="text-[#00ff41]/70 mb-6 text-lg">
+                        Tools are useless without methodology. The OSINT cycle involves planning, gathering, processing, analyzing, and disseminating.
+                    </p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#00ff41] mt-1 mr-3"></i>
+                            <div>
+                                <strong class="text-[#00ff41]">Passive vs. Active:</strong>
+                                <span class="text-[#00ff41]/50 text-sm block">Understand when to browse silently and when to interact with the target systems.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#00ff41] mt-1 mr-3"></i>
+                            <div>
+                                <strong class="text-[#00ff41]">The Pivot:</strong>
+                                <span class="text-[#00ff41]/50 text-sm block">Learn to connect a single username to an email, then to a domain, and finally to a physical location.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- PLAYLIST VISUALIZATION -->
+                <div class="relative group cursor-pointer w-full max-w-lg mx-auto transform hover:scale-105 transition-all duration-300">
+                    <div class="absolute top-0 right-0 w-full h-full bg-[#00ff41]/20 rounded-xl transform translate-x-3 -translate-y-3 opacity-40 z-0"></div>
+                    <div class="absolute top-0 right-0 w-full h-full bg-[#00ff41]/10 rounded-xl transform translate-x-6 -translate-y-6 opacity-20 z-0"></div>
+                    
+                    <div class="relative bg-gradient-to-br from-[#001a00] via-[#002a00] to-black rounded-xl overflow-hidden border border-[#00ff41]/30 aspect-video z-10 flex flex-col items-center justify-center text-center">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+                        
+                        <div class="relative w-20 h-20 bg-[#00ff41] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,255,65,0.5)] group-hover:scale-110 transition-transform duration-300 mb-4">
+                            <i class="fas fa-play text-black text-3xl ml-1"></i>
+                        </div>
+                        
+                        <h3 class="relative text-2xl font-bold text-[#00ff41] mb-2 glow-text" style="font-family: 'Orbitron', sans-serif;">OSINT Fundamentals</h3>
+                        <div class="relative inline-block bg-[#00ff41]/10 px-3 py-1 rounded text-xs text-[#00ff41] font-mono border border-[#00ff41]/30">
+                            <i class="fas fa-list-ul mr-2"></i> COMPLETE PLAYLIST
+                        </div>
+                    </div>
+                    <a href="https://youtube.com/playlist?list=PL56h9ehIniaWvb0nG7hwRKFS7n2oNDqF3&si=XGs-iZI3gUFd7UvT" target="_blank" class="absolute inset-0 z-20" aria-label="Watch OSINT Playlist"></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer with Instagram Button -->
+    <footer class="bg-black border-t border-[#00ff41]/20 py-12 mt-8">
+        <div class="container mx-auto px-4 flex flex-col items-center justify-center text-center">
+            
+            <!-- Instagram Button -->
+            <div class="mb-8">
+                <a href="https://www.instagram.com/myself_immortal/" target="_blank" class="insta-btn inline-flex items-center gap-3 text-[#ff00aa] font-bold py-4 px-8 rounded-full hover:scale-105 transition-all duration-300 text-lg">
+                    <i class="fab fa-instagram text-2xl"></i>
+                    <span>Connect with @myself_immortal</span>
+                </a>
+            </div>
+            <p class="text-[#00ff41]/40 text-sm mb-2">Use these tools responsibly and ethically. Only investigate targets you have permission to test or public data.</p>
+            <p class="text-[#00ff41]/30 text-xs font-semibold">&copy; 2025 IMMORTAL_OSINTVAULT</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- MASSIVE DATA STORE: Expanded Intelligence Toolkit ---
+        const osintTools = [
+            // --- 1. FRAMEWORKS & COLLECTIONS ---
+            { name: "OSINT Framework", cat: "Framework", desc: "Interactive master directory of thousands of OSINT tools categorized by data source.", url: "https://osintframework.com", complexity: "Low" },
+            { name: "OSINT Link", cat: "Framework", desc: "Huge categorized tool library and directory.", url: "https://osint.link", complexity: "Low" },
+            { name: "IntelTechniques", cat: "Framework", desc: "Professional-grade investigation tools and search resources.", url: "https://inteltechniques.com/tools", complexity: "Medium" },
+            { name: "OSINT Combine Tools", cat: "Framework", desc: "Curated investigator toolkit and custom utilities.", url: "https://www.osintcombine.com/tools", complexity: "Medium" },
+            { name: "Awesome OSINT", cat: "Framework", desc: "Extensive GitHub curated OSINT repository.", url: "https://github.com/jivoi/awesome-osint", complexity: "Low" },
+            { name: "Start.me OSINT", cat: "Framework", desc: "Organized bookmark dashboard of intelligence resources.", url: "https://start.me/p/rx6Qj8/osint", complexity: "Low" },
+            { name: "OSINT Curious", cat: "Framework", desc: "Training material and recommended tools.", url: "https://osintcurio.us/resources/", complexity: "Medium" },
+            { name: "OSINT Deck", cat: "Framework", desc: "Clean, searchable OSINT tool database.", url: "https://osintdeck.org", complexity: "Low" },
+            { name: "Think-Pol Directory", cat: "Framework", desc: "900+ community-driven categorized tools.", url: "https://think-pol.com/tools", complexity: "Medium" },
+            { name: "Bellingcat Toolkit", cat: "Framework", desc: "Investigation-focused tools vetted by Bellingcat.", url: "https://www.bellingcat.com/resources", complexity: "Medium" },
+            { name: "Maltego", cat: "Framework", desc: "Powerful link analysis tool for visualizing relationships.", url: "https://www.maltego.com/", complexity: "High" },
+            { name: "SpiderFoot", cat: "Framework", desc: "Automated reconnaissance tool querying 100+ public sources.", url: "https://www.spiderfoot.net/", complexity: "Medium" },
+            { name: "Recon-ng", cat: "Framework", desc: "Full-featured Web Reconnaissance framework.", url: "https://github.com/lanmaster53/recon-ng", complexity: "High" },
+            { name: "Lampyre", cat: "Framework", desc: "PC application for deep data analysis and OSINT.", url: "https://lampyre.io/", complexity: "High" },
+
+            // --- 2. SEARCH ENGINES & DEEP SEARCH ---
+            { name: "DuckDuckGo", cat: "Search", desc: "Privacy-focused search engine with bang operators.", url: "https://duckduckgo.com", complexity: "Low" },
+            { name: "Brave Search", cat: "Search", desc: "Independent, private search index.", url: "https://search.brave.com", complexity: "Low" },
+            { name: "Startpage", cat: "Search", desc: "Google results fetched without tracking your IP.", url: "https://startpage.com", complexity: "Low" },
+            { name: "Mojeek", cat: "Search", desc: "Alternative search engine with its own independent crawler.", url: "https://mojeek.com", complexity: "Low" },
+            { name: "Gibiru", cat: "Search", desc: "Uncensored, private search engine.", url: "https://gibiru.com", complexity: "Low" },
+            { name: "Oscobo", cat: "Search", desc: "Anonymous and private browsing search engine.", url: "https://oscobo.com", complexity: "Low" },
+            { name: "Swisscows", cat: "Search", desc: "Privacy-safe semantic search engine.", url: "https://swisscows.com", complexity: "Low" },
+            { name: "PublicWWW", cat: "Search", desc: "Search engine for website source code and HTML signatures.", url: "https://publicwww.com", complexity: "High" },
+            { name: "Intelligence X", cat: "Search", desc: "Deep web, leak, and darknet search engine.", url: "https://intelx.io", complexity: "Medium" },
+            { name: "Andi Search", cat: "Search", desc: "AI-based conversational search engine.", url: "https://andisearch.com", complexity: "Medium" },
+            { name: "Google Dorks (GHDB)", cat: "Search", desc: "Advanced search operators to find sensitive indexed data.", url: "https://www.exploit-db.com/google-hacking-database", complexity: "Medium" },
+            { name: "Wayback Machine", cat: "Search", desc: "Digital archive of the World Wide Web.", url: "https://archive.org/web", complexity: "Low" },
+            { name: "Carrot2", cat: "Search", desc: "Clusters and organizes search results into topics.", url: "https://search.carrot2.org", complexity: "Low" },
+            { name: "Million Short", cat: "Search", desc: "Removes top-ranking sites to uncover hidden web results.", url: "https://millionshort.com", complexity: "Medium" },
+            { name: "MetaGer", cat: "Search", desc: "Privacy-focused meta search engine.", url: "https://metager.org", complexity: "Low" },
+            { name: "Boardreader", cat: "Search", desc: "Specialized search engine for forums and message boards.", url: "https://boardreader.com", complexity: "Medium" },
+            { name: "Omgili", cat: "Search", desc: "Search engine focused on discussion forums and platforms.", url: "https://omgili.com", complexity: "Medium" },
+            { name: "SearXNG", cat: "Search", desc: "Open-source, privacy-respecting meta search engine.", url: "https://searx.space", complexity: "Low" },
+            { name: "Qwant", cat: "Search", desc: "EU-based private search engine.", url: "https://qwant.com", complexity: "Low" },
+            { name: "WolframAlpha", cat: "Search", desc: "Computational intelligence and data lookup.", url: "https://wolframalpha.com", complexity: "High" },
+            { name: "Refseek", cat: "Search", desc: "Academic and educational search engine.", url: "https://refseek.com", complexity: "Low" },
+            { name: "Dogpile", cat: "Search", desc: "Aggregated search engine pulling from multiple top engines.", url: "https://dogpile.com", complexity: "Low" },
+
+            // --- 3. USERNAME, PEOPLE & IDENTITY SEARCH ---
+            { name: "WhatsMyName", cat: "People", desc: "Fast username availability and existence checker.", url: "https://whatsmyname.app", complexity: "Low" },
+            { name: "Namechk", cat: "People", desc: "Check usernames across dozens of social networks.", url: "https://namechk.com", complexity: "Low" },
+            { name: "UserSearch", cat: "People", desc: "Deep username and email correlation search engine.", url: "https://usersearch.org", complexity: "Medium" },
+            { name: "Sherlock", cat: "People", desc: "CLI tool to hunt down social media accounts by username.", url: "https://github.com/sherlock-project/sherlock", complexity: "High" },
+            { name: "ThatsThem", cat: "People", desc: "Public records, address, and reverse lookup search.", url: "https://thatsthem.com", complexity: "Low" },
+            { name: "TruePeopleSearch", cat: "People", desc: "Free people search directory for US targets.", url: "https://truepeoplesearch.com", complexity: "Low" },
+            { name: "PeekYou", cat: "People", desc: "Social identity and public link aggregator.", url: "https://peekyou.com", complexity: "Low" },
+            { name: "Pipl", cat: "People", desc: "Professional identity search and contact discovery.", url: "https://pipl.com", complexity: "Medium" },
+            { name: "Spokeo", cat: "People", desc: "Aggregated identity, address, and phone search.", url: "https://spokeo.com", complexity: "Medium" },
+            { name: "Radaris", cat: "People", desc: "Public record aggregation and background checks.", url: "https://radaris.com", complexity: "Medium" },
+            { name: "FastPeopleSearch", cat: "People", desc: "Quick public database lookup for people.", url: "https://fastpeoplesearch.com", complexity: "Low" },
+            { name: "WebMii", cat: "People", desc: "Online presence scoring and identity search.", url: "http://webmii.com", complexity: "Low" },
+            { name: "Yasni", cat: "People", desc: "Person search engine for public information.", url: "https://yasni.com", complexity: "Low" },
+            { name: "IDCrawl", cat: "People", desc: "Identity aggregator crawling social media and web records.", url: "https://idcrawl.com", complexity: "Medium" },
+            { name: "PeopleFinder", cat: "People", desc: "Background check and public records database.", url: "https://peoplefinder.com", complexity: "Low" },
+            { name: "ZabaSearch", cat: "People", desc: "US people search and public records directory.", url: "https://zabasearch.com", complexity: "Low" },
+            { name: "Sync.me", cat: "Phone", desc: "Reverse phone number lookup and caller ID.", url: "https://sync.me", complexity: "Low" },
+            { name: "Truecaller", cat: "Phone", desc: "Global caller ID and spam blocking directory.", url: "https://truecaller.com", complexity: "Low" },
+
+            // --- 4. EMAIL INTELLIGENCE ---
+            { name: "Hunter.io", cat: "Email", desc: "Find professional email addresses associated with domains.", url: "https://hunter.io", complexity: "Low" },
+            { name: "EmailRep", cat: "Email", desc: "Email reputation, risk analysis, and domain age check.", url: "https://emailrep.io", complexity: "Medium" },
+            { name: "HaveIBeenPwned", cat: "Email", desc: "Check if an email has been compromised in a breach.", url: "https://haveibeenpwned.com", complexity: "Low" },
+            { name: "Holehe", cat: "Email", desc: "CLI tool checking if an email is attached to various platforms.", url: "https://github.com/megadose/holehe", complexity: "High" },
+            { name: "Dehashed", cat: "Email", desc: "Search for leaked credentials and clear-text passwords.", url: "https://dehashed.com", complexity: "Medium" },
+            { name: "Epieos", cat: "Email", desc: "Retrieve Google ID, maps, and profile info from an email.", url: "https://epieos.com", complexity: "Low" },
+            { name: "VoilaNorbert", cat: "Email", desc: "B2B contact finder and email verification tool.", url: "https://voilanorbert.com", complexity: "Low" },
+            { name: "Skymem", cat: "Email", desc: "Email search engine across public databases.", url: "http://www.skymem.info", complexity: "Low" },
+            { name: "LeakCheck", cat: "Email", desc: "Database breach lookup for credentials.", url: "https://leakcheck.io", complexity: "Medium" },
+            { name: "MailTester", cat: "Email", desc: "Validate email existences via SMTP checks.", url: "https://mailtester.com", complexity: "Low" },
+            { name: "EmailHippo", cat: "Email", desc: "Advanced email verification and validation service.", url: "https://emailhippo.com", complexity: "Medium" },
+            { name: "VerifyEmailAddress", cat: "Email", desc: "Simple SMTP validation tool.", url: "https://verifyemailaddress.org", complexity: "Low" },
+            { name: "FindThatLead", cat: "Email", desc: "B2B email discovery platform.", url: "https://findthatlead.com", complexity: "Medium" },
+            { name: "Anymail Finder", cat: "Email", desc: "Find any verified business email.", url: "https://anymailfinder.com", complexity: "Low" },
+            { name: "Clearbit Connect", cat: "Email", desc: "Email lookup and lead enrichment plugin.", url: "https://clearbit.com", complexity: "Medium" },
+            { name: "Snov.io", cat: "Email", desc: "Email finder, verifier, and outreach platform.", url: "https://snov.io", complexity: "Low" },
+            { name: "MailboxLayer", cat: "Email", desc: "Email API validation and quality checker.", url: "https://mailboxlayer.com", complexity: "Medium" },
+            { name: "GitHub Email Finder", cat: "Email", desc: "Extract hidden emails from GitHub commits.", url: "https://github.com/gwen001/github-search", complexity: "High" },
+            { name: "LeakPeek", cat: "Email", desc: "Breach search engine for exposed passwords.", url: "https://leakpeek.com", complexity: "Medium" },
+
+            // --- 5. DOMAIN, DNS, NETWORK & INFRA ---
+            { name: "Shodan", cat: "Network", desc: "Search engine for Internet-connected IoT devices.", url: "https://shodan.io", complexity: "Medium" },
+            { name: "Censys", cat: "Network", desc: "Internet scanning engine to discover hosts and certificates.", url: "https://censys.io", complexity: "Medium" },
+            { name: "ZoomEye", cat: "Network", desc: "Cyberspace search engine for network device footprints.", url: "https://zoomeye.org", complexity: "Medium" },
+            { name: "BinaryEdge", cat: "Network", desc: "Threat intelligence and attack surface scanning.", url: "https://binaryedge.io", complexity: "High" },
+            { name: "Netlas", cat: "Network", desc: "Search and monitor internet-connected assets and networks.", url: "https://netlas.io", complexity: "Medium" },
+            { name: "SecurityTrails", cat: "Domain", desc: "Historical DNS records and domain data.", url: "https://securitytrails.com", complexity: "Medium" },
+            { name: "DNSDumpster", cat: "Domain", desc: "Domain research tool mapping subdomains.", url: "https://dnsdumpster.com", complexity: "Low" },
+            { name: "ViewDNS", cat: "Domain", desc: "One-stop site for reverse IP, WHOIS, and DNS tools.", url: "https://viewdns.info", complexity: "Low" },
+            { name: "Amass", cat: "Domain", desc: "In-depth Attack Surface Mapping and Subdomain Discovery.", url: "https://github.com/owasp-amass/amass", complexity: "High" },
+            { name: "theHarvester", cat: "Domain", desc: "Gather emails, subdomains, hosts, and employee names.", url: "https://github.com/laramies/theHarvester", complexity: "High" },
+            { name: "WhoisXML API", cat: "Domain", desc: "Deep WHOIS intelligence and history.", url: "https://whoisxmlapi.com", complexity: "Medium" },
+            { name: "IPinfo", cat: "Network", desc: "Comprehensive IP address and ASN geolocation data.", url: "https://ipinfo.io", complexity: "Low" },
+            { name: "ARIN Lookup", cat: "Network", desc: "IP ownership and registry information lookup.", url: "https://arin.net", complexity: "Medium" },
+            { name: "Robtex", cat: "Domain", desc: "IP, domain, WHOIS, and routing intelligence platform.", url: "https://robtex.com", complexity: "Medium" },
+            { name: "DNSlytics", cat: "Domain", desc: "Reverse DNS, analytics, and infrastructure tracking.", url: "https://dnslytics.com", complexity: "Medium" },
+            { name: "PassiveTotal", cat: "Network", desc: "RiskIQ's threat intelligence and infrastructure pivoting tool.", url: "https://community.riskiq.com", complexity: "High" },
+            { name: "Hurricane Electric BGP", cat: "Network", desc: "BGP toolkit and ASN mapping intelligence.", url: "https://bgp.he.net", complexity: "High" },
+            { name: "MXToolbox", cat: "Domain", desc: "DNS, SMTP, and MX record troubleshooting tool.", url: "https://mxtoolbox.com", complexity: "Low" },
+            { name: "Sublist3r", cat: "Domain", desc: "Fast subdomain enumeration tool using open sources.", url: "https://github.com/aboul3la/Sublist3r", complexity: "High" },
+            { name: "Knockpy", cat: "Domain", desc: "Python tool to scan for subdomains via dictionary attacks.", url: "https://github.com/guelfoweb/knock", complexity: "High" },
+
+            // --- 6. SOCMINT (SOCIAL MEDIA) ---
+            { name: "Twint", cat: "SOCMINT", desc: "Advanced Twitter scraping tool without needing API keys.", url: "https://github.com/twintproject/twint", complexity: "High" },
+            { name: "Instaloader", cat: "SOCMINT", desc: "Download pictures and metadata from Instagram accounts.", url: "https://instaloader.github.io", complexity: "High" },
+            { name: "TikTok Scraper", cat: "SOCMINT", desc: "Scrape and download TikTok profiles and videos.", url: "https://github.com/drawrowfly/tiktok-scraper", complexity: "High" },
+            { name: "Social Bearing", cat: "SOCMINT", desc: "In-depth Twitter analytics and sentiment tracking.", url: "https://socialbearing.com", complexity: "Medium" },
+            { name: "Followerwonk", cat: "SOCMINT", desc: "Twitter profile analytics and follower graphing.", url: "https://followerwonk.com", complexity: "Medium" },
+            { name: "ExportComments", cat: "SOCMINT", desc: "Export comments from YouTube, Instagram, and more.", url: "https://exportcomments.com", complexity: "Low" },
+            { name: "YouTube DataViewer", cat: "SOCMINT", desc: "Extract upload times and thumbnails for video verification.", url: "https://citizenevidence.amnestyusa.org", complexity: "Medium" },
+            { name: "Social Searcher", cat: "SOCMINT", desc: "Real-time search engine for social media mentions.", url: "https://social-searcher.com", complexity: "Low" },
+            { name: "RedditSearch", cat: "SOCMINT", desc: "Archived search tool for Reddit posts and comments.", url: "https://redditsearch.io", complexity: "Low" },
+            { name: "TweetDeck", cat: "SOCMINT", desc: "Real-time tracking of Twitter timelines and searches.", url: "https://tweetdeck.twitter.com", complexity: "Low" },
+            { name: "Inflact", cat: "SOCMINT", desc: "Instagram tools, profile analysis, and viewers.", url: "https://inflact.com", complexity: "Medium" },
+            { name: "IG Audit", cat: "SOCMINT", desc: "Detect fake followers on Instagram.", url: "https://igaudit.io", complexity: "Low" },
+            { name: "HypeAuditor", cat: "SOCMINT", desc: "Influencer analysis and audience demographic tools.", url: "https://hypeauditor.com", complexity: "Medium" },
+            { name: "TweetBinder", cat: "SOCMINT", desc: "Twitter analytics and hashtag tracking.", url: "https://tweetbinder.com", complexity: "Medium" },
+            { name: "Trendsmap", cat: "SOCMINT", desc: "Location-based Twitter trending topic visualization.", url: "https://trendsmap.com", complexity: "Low" },
+            { name: "SocialBlade", cat: "SOCMINT", desc: "Detailed statistics and analytics for social media platforms.", url: "https://socialblade.com", complexity: "Low" },
+            { name: "Ninjalitics", cat: "SOCMINT", desc: "Instagram and TikTok growth analysis.", url: "https://ninjalitics.com", complexity: "Low" },
+            { name: "StorySaver", cat: "SOCMINT", desc: "View and download IG stories anonymously.", url: "https://storiesig.info", complexity: "Low" },
+            { name: "YouTube Comment Finder", cat: "SOCMINT", desc: "Search specific comments within a YouTube channel.", url: "https://ytcomment.kmcat.uk", complexity: "Low" },
+            { name: "TwitchTracker", cat: "SOCMINT", desc: "Analytics and statistics for Twitch streams.", url: "https://twitchtracker.com", complexity: "Low" },
+
+            // --- 7. IMAGE, VIDEO & MEDIA OSINT ---
+            { name: "Google Reverse Image", cat: "Images", desc: "Upload images to find similar sources and origins.", url: "https://images.google.com", complexity: "Low" },
+            { name: "TinEye", cat: "Images", desc: "Strict reverse image search engine.", url: "https://tineye.com", complexity: "Low" },
+            { name: "Yandex Images", cat: "Images", desc: "Excellent facial recognition and reverse image engine.", url: "https://yandex.com/images", complexity: "Low" },
+            { name: "ExifTool", cat: "Images", desc: "Read, write, and extract deep metadata from files.", url: "https://exiftool.org", complexity: "High" },
+            { name: "FotoForensics", cat: "Images", desc: "Error Level Analysis (ELA) to detect manipulated photos.", url: "https://fotoforensics.com", complexity: "Medium" },
+            { name: "InVID", cat: "Video", desc: "Browser plugin for extensive video and image verification.", url: "https://www.invid-project.eu", complexity: "Medium" },
+            { name: "PimEyes", cat: "Images", desc: "Powerful facial recognition and face search engine.", url: "https://pimeyes.com", complexity: "Medium" },
+            { name: "Image Raider", cat: "Images", desc: "Reverse image tool mapping origins across the web.", url: "https://imageraider.com", complexity: "Low" },
+            { name: "GeoSpy", cat: "Images", desc: "AI tool to predict location from a single image.", url: "https://geospy.ai", complexity: "Medium" },
+            { name: "Jeffrey’s EXIF Viewer", cat: "Images", desc: "Web-based deep EXIF metadata viewer.", url: "http://exif.regex.info", complexity: "Low" },
+            { name: "FaceCheck.ID", cat: "Images", desc: "Search the web to find people by their photo.", url: "https://facecheck.id", complexity: "Medium" },
+            { name: "Berify", cat: "Images", desc: "Image tracking and reverse search for copyright.", url: "https://berify.com", complexity: "Medium" },
+            { name: "ImgOps", cat: "Images", desc: "Meta-tool linking to dozens of image analysis platforms.", url: "https://imgops.com", complexity: "Low" },
+            { name: "DupliChecker Image", cat: "Images", desc: "Multi-engine reverse image lookup.", url: "https://duplichecker.com", complexity: "Low" },
+            { name: "Pixsy", cat: "Images", desc: "Tracking tool for stolen images and photography.", url: "https://pixsy.com", complexity: "Medium" },
+            { name: "JPEGsnoop", cat: "Images", desc: "Detailed JPEG image forensics and source analysis software.", url: "https://impulseadventure.com/photo/jpeg-snoop.html", complexity: "High" },
+            { name: "Forensically", cat: "Images", desc: "Suite of tools for digital image forensics.", url: "https://29a.ch/photo-forensics", complexity: "Medium" },
+            { name: "Deepware Scanner", cat: "Video", desc: "AI detection tool for spotting deepfake videos.", url: "https://deepware.ai", complexity: "High" },
+            
+            // --- 8. GEOINT & TRACKING ---
+            { name: "Google Earth", cat: "GEOINT", desc: "Advanced 3D satellite imagery with historical timeline.", url: "https://earth.google.com", complexity: "Medium" },
+            { name: "Google Maps", cat: "GEOINT", desc: "Standard street view, routing, and satellite maps.", url: "https://maps.google.com", complexity: "Low" },
+            { name: "OpenStreetMap", cat: "GEOINT", desc: "Crowd-sourced mapping with rich geographic data.", url: "https://openstreetmap.org", complexity: "Low" },
+            { name: "Wikimapia", cat: "GEOINT", desc: "Collaborative mapping project describing geographic locations.", url: "http://wikimapia.org", complexity: "Low" },
+            { name: "Sentinel Hub", cat: "GEOINT", desc: "High-resolution satellite imagery browser.", url: "https://sentinel-hub.com", complexity: "High" },
+            { name: "Zoom Earth", cat: "GEOINT", desc: "Live weather radar and near-real-time satellite map.", url: "https://zoom.earth", complexity: "Low" },
+            { name: "SunCalc", cat: "GEOINT", desc: "Shadow and sun position analysis based on time and date.", url: "https://suncalc.org", complexity: "Medium" },
+            { name: "FlightRadar24", cat: "GEOINT", desc: "Real-time commercial and private aircraft tracking.", url: "https://flightradar24.com", complexity: "Low" },
+            { name: "MarineTraffic", cat: "GEOINT", desc: "Real-time vessel tracking and maritime intelligence.", url: "https://marinetraffic.com", complexity: "Low" },
+            { name: "MapChecking", cat: "GEOINT", desc: "Estimate crowd sizes in defined geographic areas.", url: "https://mapchecking.com", complexity: "Medium" },
+            { name: "Liveuamap", cat: "GEOINT", desc: "Conflict mapping and event tracking globally.", url: "https://liveuamap.com", complexity: "Medium" },
+            { name: "Windy", cat: "GEOINT", desc: "Advanced weather intelligence and forecast mapping.", url: "https://windy.com", complexity: "Low" },
+            { name: "OpenAerialMap", cat: "GEOINT", desc: "Openly licensed drone and satellite imagery.", url: "https://openaerialmap.org", complexity: "High" },
+            { name: "Terraserver", cat: "GEOINT", desc: "Historical aerial photos and satellite imagery.", url: "http://terraserver.com", complexity: "Medium" },
+            { name: "Mapillary", cat: "GEOINT", desc: "Crowdsourced street-level imagery platform.", url: "https://mapillary.com", complexity: "Medium" },
+            { name: "PeakVisor", cat: "GEOINT", desc: "3D mapping and identification of mountain peaks.", url: "https://peakvisor.com", complexity: "Low" },
+            { name: "GPS Visualizer", cat: "GEOINT", desc: "Plot coordinates and GPS tracks onto interactive maps.", url: "https://gpsvisualizer.com", complexity: "Medium" },
+            { name: "ADS-B Exchange", cat: "GEOINT", desc: "Unfiltered flight tracking for all aircraft.", url: "https://adsbexchange.com", complexity: "Medium" },
+
+            // --- 9. THREAT INTEL & CYBER OSINT ---
+            { name: "VirusTotal", cat: "Threat Intel", desc: "Analyze files, URLs, and domains for malware.", url: "https://virustotal.com", complexity: "Low" },
+            { name: "URLScan", cat: "Threat Intel", desc: "Website sandbox generating screenshots and DOM data.", url: "https://urlscan.io", complexity: "Medium" },
+            { name: "Hybrid Analysis", cat: "Threat Intel", desc: "Free malware analysis service powered by Falcon Sandbox.", url: "https://hybrid-analysis.com", complexity: "High" },
+            { name: "AbuseIPDB", cat: "Threat Intel", desc: "Database of abusive IPs reported by the community.", url: "https://abuseipdb.com", complexity: "Medium" },
+            { name: "AlienVault OTX", cat: "Threat Intel", desc: "Open Threat Exchange and crowd-sourced IOCs.", url: "https://otx.alienvault.com", complexity: "Medium" },
+            { name: "GreyNoise", cat: "Threat Intel", desc: "Analyze Internet background noise and active scanners.", url: "https://greynoise.io", complexity: "High" },
+            { name: "Talos Intelligence", cat: "Threat Intel", desc: "Cisco's reputation tracking and threat intel dashboard.", url: "https://talosintelligence.com", complexity: "Medium" },
+            { name: "ThreatCrowd", cat: "Threat Intel", desc: "Search engine for mapping threats and infrastructure.", url: "https://threatcrowd.org", complexity: "High" },
+            { name: "Pulsedive", cat: "Threat Intel", desc: "Free threat intelligence platform for IOC research.", url: "https://pulsedive.com", complexity: "Medium" },
+            { name: "IBM X-Force", cat: "Threat Intel", desc: "Cloud-based threat intel sharing platform.", url: "https://exchange.xforce.ibmcloud.com", complexity: "Medium" },
+
+            // --- 10. DARK WEB & LEAK OSINT ---
+            { name: "Torch Search", cat: "Dark Web", desc: "Search engine indexing hidden onion services.", url: "http://torch4st4n7kx.onion", complexity: "Medium" },
+            { name: "Ahmia", cat: "Dark Web", desc: "Surface-web gateway to search the Tor network.", url: "https://ahmia.fi", complexity: "Medium" },
+            { name: "DarkSearch", cat: "Dark Web", desc: "Dark web search engine.", url: "https://darksearch.io", complexity: "Medium" },
+            { name: "OnionScan", cat: "Dark Web", desc: "Tool for investigating the security of Onion services.", url: "https://github.com/s-rah/onionscan", complexity: "High" },
+            { name: "LeakIX", cat: "Breach", desc: "Search engine indexing data leaks and misconfigurations.", url: "https://leakix.net", complexity: "Medium" },
+            { name: "Snusbase", cat: "Breach", desc: "Data indexing platform for leaked databases.", url: "https://snusbase.com", complexity: "Medium" },
+            { name: "DeHashed API", cat: "Breach", desc: "Breach intelligence and credential lookup engine.", url: "https://dehashed.com", complexity: "High" },
+
+            // --- 11. AUTOMATION, RECON & DATA MINING ---
+            { name: "FOCA", cat: "Data Mining", desc: "Network infrastructure mapping via document metadata.", url: "https://github.com/ElevenPaths/FOCA", complexity: "High" },
+            { name: "Datasploit", cat: "Recon", desc: "Automated OSINT tool for domain, email, and IP targeting.", url: "https://github.com/datasploit/datasploit", complexity: "High" },
+            { name: "Metagoofil", cat: "Data Mining", desc: "Information gathering tool extracting metadata of public docs.", url: "https://github.com/laramies/metagoofil", complexity: "High" },
+            { name: "Creepy", cat: "Recon", desc: "Geolocation OSINT tool pulling data from social networks.", url: "https://github.com/ilektrojohn/creepy", complexity: "High" },
+            { name: "OSRFramework", cat: "Recon", desc: "Suite of tools to perform OSINT tasks programmatically.", url: "https://github.com/i3visio/osrframework", complexity: "High" },
+            { name: "LinkScope", cat: "Recon", desc: "Graph-based intelligence analysis tool.", url: "https://linkscope.org", complexity: "High" },
+            { name: "IntelHub", cat: "Recon", desc: "All-in-one browser extension for OSINT investigations.", url: "https://github.com/tomsec8/IntelHub", complexity: "Medium" },
+            { name: "Photon", cat: "Recon", desc: "Incredibly fast web crawler for extracting links, keys, and files.", url: "https://github.com/s0md3v/Photon", complexity: "High" },
+            { name: "Hakrawler", cat: "Recon", desc: "Fast web crawler for asset discovery.", url: "https://github.com/hakluke/hakrawler", complexity: "High" },
+            { name: "Aquatone", cat: "Recon", desc: "Visual inspection of websites across an infrastructure.", url: "https://github.com/michenriksen/aquatone", complexity: "High" },
+            { name: "Eyewitness", cat: "Recon", desc: "Automated screenshots and server header analysis.", url: "https://github.com/FortyNorthSecurity/EyeWitness", complexity: "High" },
+            { name: "Nuclei", cat: "Recon", desc: "Template-based vulnerability and misconfiguration scanner.", url: "https://github.com/projectdiscovery/nuclei", complexity: "High" },
+            { name: "httpx", cat: "Recon", desc: "Fast multi-purpose HTTP probing toolkit.", url: "https://github.com/projectdiscovery/httpx", complexity: "High" },
+            { name: "Gau", cat: "Recon", desc: "Fetch known URLs from AlienVault, Wayback, and Common Crawl.", url: "https://github.com/lc/gau", complexity: "High" },
+            { name: "ParamSpider", cat: "Recon", desc: "Mine URLs from dark web and archives to find parameters.", url: "https://github.com/devanshbatham/ParamSpider", complexity: "High" },
+            { name: "Arjun", cat: "Recon", desc: "HTTP parameter discovery suite.", url: "https://github.com/s0md3v/Arjun", complexity: "High" },
+            { name: "Subfinder", cat: "Recon", desc: "Subdomain discovery tool utilizing passive online sources.", url: "https://github.com/projectdiscovery/subfinder", complexity: "High" },
+            { name: "Datasette", cat: "Data Mining", desc: "Tool for exploring and publishing data databases.", url: "https://datasette.io", complexity: "High" },
+            { name: "OpenRefine", cat: "Data Mining", desc: "Powerful tool for cleaning messy data sets.", url: "https://openrefine.org", complexity: "Medium" },
+            { name: "Gephi", cat: "Data Mining", desc: "Interactive visualization and exploration platform for networks.", url: "https://gephi.org", complexity: "High" },
+            { name: "Tableau Public", cat: "Data Mining", desc: "Create and share interactive data visualizations online.", url: "https://public.tableau.com", complexity: "Medium" },
+            { name: "Kumu", cat: "Data Mining", desc: "Relationship mapping and complex network visualization.", url: "https://kumu.io", complexity: "Medium" },
+            { name: "LittleSis", cat: "Data Mining", desc: "Database mapping the networks of powerful people/orgs.", url: "https://littlesis.org", complexity: "Medium" },
+            { name: "Aleph (OCCRP)", cat: "Data Mining", desc: "Global investigative database mapping corporate structures.", url: "https://aleph.occrp.org", complexity: "Medium" },
+            { name: "DocumentCloud", cat: "Data Mining", desc: "Upload, analyze, and publish primary source documents.", url: "https://documentcloud.org", complexity: "Medium" },
+            { name: "ArchiveBox", cat: "Data Mining", desc: "Self-hosted internet archiving platform.", url: "https://archivebox.io", complexity: "High" },
+
+            // --- 21. NICHE SEARCH ENGINES & DISCOVERY ---
+            { name: "SearchTempest", cat: "Search", desc: "Craigslist aggregator for searching multiple cities.", url: "https://searchtempest.com", complexity: "Low" },
+            { name: "ZapMeta", cat: "Search", desc: "Meta search engine combining results.", url: "https://zapmeta.com", complexity: "Low" },
+            { name: "EntireWeb", cat: "Search", desc: "Alternative search engine.", url: "https://entireweb.com", complexity: "Low" },
+            { name: "eTools", cat: "Search", desc: "Meta search with privacy.", url: "https://etools.ch", complexity: "Low" },
+            { name: "Lycos", cat: "Search", desc: "Old-school search engine.", url: "https://lycos.com", complexity: "Low" },
+            { name: "iSeek", cat: "Search", desc: "Safe search for education.", url: "https://iseek.com", complexity: "Low" },
+            { name: "Peekier", cat: "Search", desc: "Preview-based search engine.", url: "https://peekier.com", complexity: "Low" },
+            { name: "Yippy", cat: "Search", desc: "Cluster-based search results.", url: "https://yippy.com", complexity: "Low" },
+            { name: "Biznar", cat: "Search", desc: "Business search engine.", url: "https://biznar.com", complexity: "Medium" },
+            { name: "WorldWideScience", cat: "Search", desc: "Scientific papers search.", url: "https://worldwidescience.org", complexity: "Medium" },
+            { name: "Semantic Scholar", cat: "Search", desc: "AI-powered research search.", url: "https://semanticscholar.org", complexity: "Medium" },
+            { name: "BASE", cat: "Search", desc: "Academic database search.", url: "https://base-search.net", complexity: "Medium" },
+            { name: "CORE", cat: "Search", desc: "Research aggregator.", url: "https://core.ac.uk", complexity: "Medium" },
+            { name: "Science.gov", cat: "Search", desc: "US government science search.", url: "https://science.gov", complexity: "Low" },
+            { name: "OpenGrey", cat: "Search", desc: "European grey literature.", url: "http://opengrey.eu", complexity: "Medium" },
+            { name: "Paperity", cat: "Search", desc: "Open access journals.", url: "https://paperity.org", complexity: "Low" },
+            { name: "ERIC", cat: "Search", desc: "Education database.", url: "https://eric.ed.gov", complexity: "Low" },
+            { name: "SSRN", cat: "Search", desc: "Social science research papers.", url: "https://ssrn.com", complexity: "Medium" },
+            { name: "CiteSeerX", cat: "Search", desc: "Computer science citations.", url: "https://citeseerx.ist.psu.edu", complexity: "Medium" },
+            { name: "Dimensions", cat: "Search", desc: "Research analytics platform.", url: "https://dimensions.ai", complexity: "High" },
+
+            // --- 22. IDENTITY & PUBLIC RECORDS ---
+            { name: "Nuwber", cat: "People", desc: "People search engine.", url: "https://nuwber.com", complexity: "Low" },
+            { name: "CocoFinder", cat: "People", desc: "Public records search.", url: "https://cocofinder.com", complexity: "Low" },
+            { name: "TruthFinder", cat: "People", desc: "Background check platform.", url: "https://truthfinder.com", complexity: "Medium" },
+            { name: "BeenVerified", cat: "People", desc: "Identity verification.", url: "https://beenverified.com", complexity: "Medium" },
+            { name: "Instant Checkmate", cat: "People", desc: "Criminal records search.", url: "https://instantcheckmate.com", complexity: "Medium" },
+            { name: "ClustrMaps", cat: "GEOINT", desc: "Location visualization.", url: "https://clustrmaps.com", complexity: "Low" },
+            { name: "VoterRecords", cat: "People", desc: "Voter data lookup.", url: "https://voterrecords.com", complexity: "Medium" },
+            { name: "USA People Search", cat: "People", desc: "US public records.", url: "https://usa-people-search.com", complexity: "Low" },
+            { name: "Addresses.com", cat: "People", desc: "Address lookup.", url: "https://addresses.com", complexity: "Low" },
+            { name: "Whitepages", cat: "People", desc: "Phone and address directory.", url: "https://whitepages.com", complexity: "Low" },
+            { name: "PhoneValidator", cat: "Phone", desc: "Validate phone numbers.", url: "https://phonevalidator.com", complexity: "Low" },
+            { name: "FreeCarrierLookup", cat: "Phone", desc: "Carrier identification.", url: "https://freecarrierlookup.com", complexity: "Low" },
+            { name: "SpyDialer", cat: "Phone", desc: "Reverse phone lookup.", url: "https://spydialer.com", complexity: "Low" },
+            { name: "NumLookup", cat: "Phone", desc: "Free phone lookup.", url: "https://numlookup.com", complexity: "Low" },
+            { name: "PhoneInfoga", cat: "Phone", desc: "Phone number OSINT tool.", url: "https://github.com/sundowndev/phoneinfoga", complexity: "High" },
+            { name: "CallerID Test", cat: "Phone", desc: "Caller ID verification.", url: "https://calleridtest.com", complexity: "Low" },
+            { name: "OpenCorporates", cat: "Business", desc: "Company registry search.", url: "https://opencorporates.com", complexity: "Medium" },
+            { name: "CompanyCheck", cat: "Business", desc: "UK company data.", url: "https://companycheck.co.uk", complexity: "Medium" },
+            { name: "Corporations Canada", cat: "Business", desc: "Canadian corp data.", url: "https://ised-isde.canada.ca", complexity: "Medium" },
+            { name: "UK Companies House", cat: "Business", desc: "UK company registry.", url: "https://companieshouse.gov.uk", complexity: "Low" },
+
+            // --- 23. EMAIL, PHONE & CONTACT OSINT ---
+            { name: "Phonebook.cz", cat: "Email", desc: "Email OSINT directory.", url: "https://phonebook.cz", complexity: "Low" },
+            { name: "Email Format", cat: "Email", desc: "Company email patterns.", url: "https://email-format.com", complexity: "Low" },
+            { name: "RocketReach", cat: "People", desc: "Contact finder.", url: "https://rocketreach.co", complexity: "Medium" },
+            { name: "Lusha", cat: "People", desc: "Business contacts.", url: "https://lusha.com", complexity: "Medium" },
+            { name: "ContactOut", cat: "People", desc: "LinkedIn email finder.", url: "https://contactout.com", complexity: "Medium" },
+            { name: "Adapt.io", cat: "People", desc: "Lead database.", url: "https://adapt.io", complexity: "Medium" },
+            { name: "GetProspect", cat: "Email", desc: "Email finder.", url: "https://getprospect.com", complexity: "Low" },
+            { name: "AeroLeads", cat: "Email", desc: "B2B lead finder.", url: "https://aeroleads.com", complexity: "Low" },
+            { name: "SignalHire", cat: "People", desc: "Talent search.", url: "https://signalhire.com", complexity: "Medium" },
+            { name: "Skrapp", cat: "Email", desc: "Email finder for LinkedIn.", url: "https://skrapp.io", complexity: "Medium" },
+            { name: "BulkEmailChecker", cat: "Email", desc: "Batch email validation.", url: "https://bulkemailchecker.com", complexity: "Low" },
+            { name: "Experte Email Check", cat: "Email", desc: "Email validator.", url: "https://experte.com/email-validator", complexity: "Low" },
+            { name: "IPQualityScore Email", cat: "Email", desc: "Email quality check.", url: "https://ipqualityscore.com", complexity: "Medium" },
+            { name: "Twilio Lookup", cat: "Phone", desc: "Phone number API.", url: "https://twilio.com/lookup", complexity: "Medium" },
+            { name: "Numverify", cat: "Phone", desc: "Phone validation.", url: "https://numverify.com", complexity: "Low" },
+            { name: "Telnyx Lookup", cat: "Phone", desc: "Carrier lookup API.", url: "https://telnyx.com", complexity: "Medium" },
+            { name: "OpenCNAM", cat: "Phone", desc: "Caller ID API.", url: "https://opencnam.com", complexity: "Low" },
+            { name: "Sync API", cat: "Phone", desc: "Phone identity API.", url: "https://sync.me/api", complexity: "Medium" },
+            { name: "CallApp", cat: "Phone", desc: "Caller ID app.", url: "https://callapp.com", complexity: "Low" },
+
+            // --- 24. DOMAINS, HOSTING & INFRA DEEP ---
+            { name: "BuiltWith", cat: "Domain", desc: "Tech stack lookup.", url: "https://builtwith.com", complexity: "Low" },
+            { name: "Wappalyzer", cat: "Domain", desc: "Website technology profiler.", url: "https://wappalyzer.com", complexity: "Low" },
+            { name: "Netcraft", cat: "Network", desc: "Hosting intelligence.", url: "https://netcraft.com", complexity: "Medium" },
+            { name: "SiteReport", cat: "Domain", desc: "Detailed site analysis.", url: "https://sitereport.netcraft.com", complexity: "Medium" },
+            { name: "DNSChecker", cat: "Domain", desc: "DNS validation.", url: "https://dnschecker.org", complexity: "Low" },
+            { name: "IntoDNS", cat: "Domain", desc: "DNS diagnostics.", url: "https://intodns.com", complexity: "Low" },
+            { name: "IPVoid", cat: "Threat Intel", desc: "IP reputation check.", url: "https://ipvoid.com", complexity: "Medium" },
+            { name: "URLVoid", cat: "Threat Intel", desc: "URL scanner.", url: "https://urlvoid.com", complexity: "Medium" },
+            { name: "ThreatMiner", cat: "Threat Intel", desc: "Threat intelligence portal.", url: "https://threatminer.org", complexity: "High" },
+            { name: "RiskIQ Community", cat: "Threat Intel", desc: "Threat infrastructure.", url: "https://community.riskiq.com", complexity: "High" },
+            { name: "CertSpotter", cat: "Domain", desc: "SSL certificate monitor.", url: "https://certspotter.com", complexity: "Medium" },
+            { name: "crt.sh", cat: "Domain", desc: "Certificate transparency logs.", url: "https://crt.sh", complexity: "Medium" },
+            { name: "FOFA", cat: "Network", desc: "Cyberspace mapping.", url: "https://fofa.info", complexity: "High" },
+            { name: "DomainTools", cat: "Domain", desc: "WHOIS and domain intelligence.", url: "https://domaintools.com", complexity: "Medium" },
+            { name: "Whoisology", cat: "Domain", desc: "WHOIS relationship search.", url: "https://whoisology.com", complexity: "Medium" },
+            { name: "DNSHistory", cat: "Domain", desc: "Historical DNS data.", url: "https://dnshistory.org", complexity: "Medium" },
+            { name: "Reverse IP", cat: "Domain", desc: "ViewDNS reverse IP.", url: "https://viewdns.info/reverseip", complexity: "Low" },
+
+            // --- 25. SOCIAL MEDIA & CONTENT INTELLIGENCE ---
+            { name: "BrandMentions", cat: "SOCMINT", desc: "Brand monitoring.", url: "https://brandmentions.com", complexity: "Medium" },
+            { name: "Mention", cat: "SOCMINT", desc: "Social media monitoring.", url: "https://mention.com", complexity: "Medium" },
+            { name: "Keyhole", cat: "SOCMINT", desc: "Hashtag tracking.", url: "https://keyhole.co", complexity: "Medium" },
+            { name: "Talkwalker", cat: "SOCMINT", desc: "Social listening.", url: "https://talkwalker.com", complexity: "High" },
+            { name: "Sprout Social", cat: "SOCMINT", desc: "Social management.", url: "https://sproutsocial.com", complexity: "High" },
+            { name: "AgoraPulse", cat: "SOCMINT", desc: "Social media manager.", url: "https://agorapulse.com", complexity: "Medium" },
+            { name: "BuzzSumo", cat: "SOCMINT", desc: "Content analysis.", url: "https://buzzsumo.com", complexity: "Medium" },
+            { name: "RiteTag", cat: "SOCMINT", desc: "Hashtag analytics.", url: "https://ritetag.com", complexity: "Low" },
+            { name: "Hashtagify", cat: "SOCMINT", desc: "Hashtag finder.", url: "https://hashtagify.me", complexity: "Low" },
+            { name: "Social Animal", cat: "SOCMINT", desc: "Content research.", url: "https://socialanimal.com", complexity: "Medium" },
+            { name: "Foller.me", cat: "SOCMINT", desc: "Twitter profile analyzer.", url: "https://foller.me", complexity: "Low" },
+            { name: "Twitonomy", cat: "SOCMINT", desc: "Twitter analytics.", url: "https://twitonomy.com", complexity: "Medium" },
+            { name: "Tweet Archivist", cat: "SOCMINT", desc: "Tweet archiving.", url: "https://tweetarchivist.com", complexity: "Low" },
+            { name: "AllMyTweets", cat: "SOCMINT", desc: "View all tweets.", url: "https://allmytweets.net", complexity: "Low" },
+            { name: "Downloader for IG", cat: "SOCMINT", desc: "Instagram downloader.", url: "https://igram.io", complexity: "Low" },
+            { name: "SaveFrom", cat: "SOCMINT", desc: "Social media downloader.", url: "https://savefrom.net", complexity: "Low" },
+            { name: "RedditMetrics", cat: "SOCMINT", desc: "Subreddit analytics.", url: "https://redditmetrics.com", complexity: "Low" },
+            { name: "SubredditStats", cat: "SOCMINT", desc: "Reddit statistics.", url: "https://subredditstats.com", complexity: "Low" },
+            { name: "Later Analytics", cat: "SOCMINT", desc: "Social analytics.", url: "https://later.com", complexity: "Medium" },
+
+            // --- 26. MEDIA, DEEPFAKE & VERIFICATION ---
+            { name: "DeepFaceLab", cat: "Video", desc: "Deepfake analysis.", url: "https://github.com/iperov/DeepFaceLab", complexity: "High" },
+            { name: "Sensity AI", cat: "Video", desc: "Deepfake detection.", url: "https://sensity.ai", complexity: "High" },
+            { name: "Amber Video", cat: "Video", desc: "Video forensics.", url: "https://ambervideo.co", complexity: "High" },
+            { name: "Microsoft Video Authenticator", cat: "Video", desc: "Video authenticity check.", url: "https://azure.microsoft.com/services/cognitive-services/video-indexer/", complexity: "High" },
+            { name: "Metadata2Go", cat: "Images", desc: "Online metadata viewer.", url: "https://metadata2go.com", complexity: "Low" },
+            { name: "Image Edited Detector", cat: "Images", desc: "Detect image manipulation.", url: "https://imageedited.com", complexity: "Medium" },
+            { name: "JPEG Repair Toolkit", cat: "Images", desc: "JPEG forensics.", url: "https://impulseadventure.com/photo/jpeg-snoop.html", complexity: "High" },
+            { name: "Ghiro", cat: "Images", desc: "Digital forensics platform.", url: "https://getghiro.org", complexity: "High" },
+            { name: "StegOnline", cat: "Images", desc: "Steganography tool.", url: "https://stegonline.georgeom.net", complexity: "High" },
+            { name: "AperiSolve", cat: "Images", desc: "Image analysis platform.", url: "https://aperisolve.fr", complexity: "Medium" },
+            { name: "Sonic Visualizer", cat: "Audio", desc: "Audio analysis.", url: "https://www.sonicvisualiser.org/", complexity: "Medium" },
+            { name: "Audacity", cat: "Audio", desc: "Audio forensics.", url: "https://audacityteam.org/", complexity: "Medium" },
+            { name: "FFmpeg", cat: "Video", desc: "Media processing.", url: "https://ffmpeg.org/", complexity: "High" },
+            { name: "VLC Codec Info", cat: "Video", desc: "Media codec info.", url: "https://www.videolan.org/vlc/", complexity: "Low" },
+            { name: "MediaInfo", cat: "Video", desc: "Media metadata.", url: "https://mediaarea.net", complexity: "Low" },
+            { name: "Fake Image Detector", cat: "Images", desc: "AI image detection.", url: "https://fakeimagedetector.com", complexity: "Medium" },
+
+            // --- 27. GEOINT ADVANCED ---
+            { name: "MapCrunch", cat: "GEOINT", desc: "Random location explorer.", url: "https://mapcrunch.com", complexity: "Low" },
+            { name: "GeoGuessr", cat: "GEOINT", desc: "Location guessing game.", url: "https://geoguessr.com", complexity: "Low" },
+            { name: "Wikiloc", cat: "GEOINT", desc: "GPS trails and routes.", url: "https://wikiloc.com", complexity: "Low" },
+            { name: "AllTrails", cat: "GEOINT", desc: "Hiking trail data.", url: "https://alltrails.com", complexity: "Low" },
+            { name: "PeakFinder", cat: "GEOINT", desc: "Mountain identification.", url: "https://peakfinder.com", complexity: "Low" },
+            { name: "SunSeeker", cat: "GEOINT", desc: "Sun tracking app.", url: "https://sunseeker.app", complexity: "Low" },
+            { name: "ShadowCalculator", cat: "GEOINT", desc: "Shadow analysis.", url: "https://shadowcalculator.com", complexity: "Medium" },
+            { name: "OpenTopoMap", cat: "GEOINT", desc: "Topographic maps.", url: "https://opentopomap.org", complexity: "Low" },
+            { name: "CalTopo", cat: "GEOINT", desc: "Topographic mapping.", url: "https://caltopo.com", complexity: "Medium" },
+            { name: "NASA Worldview", cat: "GEOINT", desc: "Satellite imagery.", url: "https://worldview.earthdata.nasa.gov", complexity: "Medium" },
+            { name: "EO Browser", cat: "GEOINT", desc: "Satellite data browser.", url: "https://apps.sentinel-hub.com", complexity: "Medium" },
+            { name: "RainViewer", cat: "GEOINT", desc: "Weather radar.", url: "https://rainviewer.com", complexity: "Low" },
+            { name: "MarineCadastre", cat: "GEOINT", desc: "Maritime data.", url: "https://marinecadastre.gov", complexity: "Medium" },
+            { name: "VesselFinder", cat: "GEOINT", desc: "Ship tracking.", url: "https://vesselfinder.com", complexity: "Low" },
+            { name: "Planefinder", cat: "GEOINT", desc: "Aircraft tracking.", url: "https://planefinder.net", complexity: "Low" },
+            { name: "FlightAware", cat: "GEOINT", desc: "Flight tracking.", url: "https://flightaware.com", complexity: "Low" },
+            { name: "SkyVector", cat: "GEOINT", desc: "Aviation charts.", url: "https://skyvector.com", complexity: "Medium" },
+
+            // --- 28. DATA ANALYSIS & VISUALIZATION ---
+            { name: "Power BI", cat: "Data Mining", desc: "Business intelligence.", url: "https://powerbi.microsoft.com", complexity: "High" },
+            { name: "QGIS", cat: "Data Mining", desc: "Open source GIS.", url: "https://qgis.org", complexity: "High" },
+            { name: "ArcGIS", cat: "Data Mining", desc: "GIS platform.", url: "https://arcgis.com", complexity: "High" },
+            { name: "Kibana", cat: "Data Mining", desc: "Data visualization.", url: "https://elastic.co/kibana", complexity: "High" },
+            { name: "ElasticSearch", cat: "Data Mining", desc: "Search engine.", url: "https://elastic.co/elasticsearch", complexity: "High" },
+            { name: "RapidMiner", cat: "Data Mining", desc: "Data science platform.", url: "https://rapidminer.com", complexity: "High" },
+            { name: "KNIME", cat: "Data Mining", desc: "Data analytics.", url: "https://knime.com", complexity: "Medium" },
+            { name: "Orange Data Mining", cat: "Data Mining", desc: "Visual programming.", url: "https://orange.biolab.si", complexity: "Medium" },
+            { name: "D3.js", cat: "Data Mining", desc: "Data visualization library.", url: "https://d3js.org", complexity: "High" },
+            { name: "RAWGraphs", cat: "Data Mining", desc: "Data visualization.", url: "https://rawgraphs.io", complexity: "Medium" },
+            { name: "Flourish", cat: "Data Mining", desc: "Data storytelling.", url: "https://flourish.studio", complexity: "Low" },
+            { name: "Datawrapper", cat: "Data Mining", desc: "Chart creation.", url: "https://datawrapper.de", complexity: "Low" },
+            { name: "Plotly", cat: "Data Mining", desc: "Python plotting.", url: "https://plotly.com", complexity: "Medium" },
+            { name: "Cytoscape", cat: "Data Mining", desc: "Network visualization.", url: "https://cytoscape.org", complexity: "High" },
+            { name: "Graph Commons", cat: "Data Mining", desc: "Graph platform.", url: "https://graphcommons.com", complexity: "Medium" },
+            { name: "NodeXL", cat: "Data Mining", desc: "Network analysis.", url: "https://nodexl.com", complexity: "High" },
+            { name: "Tableau CRM", cat: "Data Mining", desc: "CRM analytics.", url: "https://tableau.com", complexity: "High" },
+            { name: "Observable HQ", cat: "Data Mining", desc: "Data notebooks.", url: "https://observablehq.com", complexity: "Medium" },
+            { name: "Metabase", cat: "Data Mining", desc: "Open source analytics.", url: "https://metabase.com", complexity: "Medium" },
+
+            // --- 29. RECON, CRAWLING & ENUMERATION ---
+            { name: "Katana", cat: "Recon", desc: "Next-gen crawling.", url: "https://github.com/projectdiscovery/katana", complexity: "High" },
+            { name: "Gospider", cat: "Recon", desc: "Fast web spider.", url: "https://github.com/hakluke/gospider", complexity: "High" },
+            { name: "Dirsearch", cat: "Recon", desc: "Web path scanner.", url: "https://github.com/maurosoria/dirsearch", complexity: "High" },
+            { name: "FFUF", cat: "Recon", desc: "Fast web fuzzer.", url: "https://github.com/ffuf/ffuf", complexity: "High" },
+            { name: "Gobuster", cat: "Recon", desc: "Directory enumeration.", url: "https://github.com/OJ/gobuster", complexity: "High" },
+            { name: "Dirbuster", cat: "Recon", desc: "Dir brute force.", url: "https://github.com/jcesar2406/dirbuster", complexity: "High" },
+            { name: "Nikto", cat: "Recon", desc: "Web vulnerability scanner.", url: "https://github.com/sullo/nikto", complexity: "High" },
+            { name: "WhatWeb", cat: "Recon", desc: "Technology fingerprint.", url: "https://github.com/urbanadventurer/WhatWeb", complexity: "High" },
+            { name: "Wfuzz", cat: "Recon", desc: "Web fuzzer.", url: "https://github.com/xmendez/wfuzz", complexity: "High" },
+            { name: "Masscan", cat: "Recon", desc: "Fast port scanner.", url: "https://github.com/robertdavidgraham/masscan", complexity: "High" },
+            { name: "ZMap", cat: "Recon", desc: "Network scanner.", url: "https://github.com/zmap/zmap", complexity: "High" },
+            { name: "Naabu", cat: "Recon", desc: "Port scanner.", url: "https://github.com/projectdiscovery/naabu", complexity: "High" },
+            { name: "Sn1per", cat: "Recon", desc: "Attack surface scanner.", url: "https://github.com/1N3/Sn1per", complexity: "High" },
+            { name: "Osmedeus", cat: "Recon", desc: "Recon automation.", url: "https://github.com/j3ssie/Osmedeus", complexity: "High" },
+            { name: "LazyRecon", cat: "Recon", desc: "Recon automation.", url: "https://github.com/capt-meelo/LazyRecon", complexity: "High" },
+            { name: "AutoRecon", cat: "Recon", desc: "Automated recon.", url: "https://github.com/Tib3rius/AutoRecon", complexity: "High" },
+            { name: "ReconFTW", cat: "Recon", desc: "Recon automation tool.", url: "https://github.com/six2dez/reconftw", complexity: "High" },
+
+            // --- 30. INTELLIGENCE & INVESTIGATION PLATFORMS ---
+            { name: "Babel Street", cat: "Framework", desc: "Premium intel platform.", url: "https://babelstreet.com", complexity: "High" },
+            { name: "Palantir Gotham", cat: "Framework", desc: "Enterprise analytics.", url: "https://palantir.com", complexity: "High" },
+            { name: "Recorded Future", cat: "Threat Intel", desc: "Threat intelligence.", url: "https://recordedfuture.com", complexity: "High" },
+            { name: "Flashpoint Intel", cat: "Threat Intel", desc: "Threat intelligence.", url: "https://flashpoint.io", complexity: "High" },
+            { name: "ShadowDragon", cat: "Framework", desc: "OSINT platform.", url: "https://shadowdragon.io", complexity: "High" },
+            { name: "Cobwebs Technologies", cat: "Framework", desc: "Investigation platform.", url: "https://cobwebs.com", complexity: "High" },
+            { name: "Voyager Labs", cat: "Framework", desc: "Investigation AI.", url: "https://voyagerlabs.com", complexity: "High" },
+            { name: "Echosec Systems", cat: "GEOINT", desc: "Location intelligence.", url: "https://echosec.com", complexity: "High" },
+            { name: "Dataminr", cat: "Threat Intel", desc: "Real-time intel.", url: "https://dataminr.com", complexity: "High" },
+            { name: "Skopenow", cat: "Framework", desc: "OSINT platform.", url: "https://skopenow.com", complexity: "High" },
+            { name: "Social Links", cat: "SOCMINT", desc: "Social media OSINT.", url: "https://sociallinks.io", complexity: "High" },
+            { name: "Blackdot Solutions", cat: "Framework", desc: "Investigation tools.", url: "https://blackdot.co.uk", complexity: "High" },
+            { name: "Siren Platform", cat: "Framework", desc: "Link analysis.", url: "https://siren.io", complexity: "High" },
+            { name: "Quid", cat: "Data Mining", desc: "Network analysis.", url: "https://quid.com", complexity: "High" },
+            { name: "Predata", cat: "Threat Intel", desc: "Risk intelligence.", url: "https://predata.com", complexity: "High" },
+            { name: "Sayari", cat: "Framework", desc: "Relationship data.", url: "https://sayari.com", complexity: "High" },
+            { name: "Kaseware", cat: "Framework", desc: "Investigation case management.", url: "https://kaseware.com", complexity: "High" },
+            { name: "Hunchly", cat: "Recon", desc: "Web capture tool.", url: "https://hunchly.com", complexity: "Medium" },
+            { name: "CaseFile", cat: "Framework", desc: "Offline link analysis.", url: "https://maltego.com/casefile", complexity: "Medium" },
+
+            // --- 31. INTERNATIONAL SEARCH ENGINES ---
+            { name: "Najdi.si", cat: "Search", desc: "Slovenian search engine.", url: "https://najdi.si", complexity: "Low" },
+            { name: "Seznam", cat: "Search", desc: "Czech search engine.", url: "https://search.seznam.cz", complexity: "Low" },
+            { name: "Onet", cat: "Search", desc: "Polish search portal.", url: "https://szukaj.onet.pl", complexity: "Low" },
+            { name: "Rambler", cat: "Search", desc: "Russian search engine.", url: "https://nova.rambler.ru", complexity: "Low" },
+            { name: "Sogou", cat: "Search", desc: "Chinese search engine.", url: "https://sogou.com", complexity: "Medium" },
+            { name: "Naver", cat: "Search", desc: "Korean search portal.", url: "https://naver.com", complexity: "Medium" },
+            { name: "Daum", cat: "Search", desc: "Korean web portal.", url: "https://daum.net", complexity: "Low" },
+            { name: "Goo", cat: "Search", desc: "Japanese search engine.", url: "https://goo.ne.jp", complexity: "Low" },
+            { name: "Yahoo Japan", cat: "Search", desc: "Japanese Yahoo search.", url: "https://search.yahoo.co.jp", complexity: "Low" },
+            { name: "Baidu", cat: "Search", desc: "China's top search engine.", url: "https://baidu.com", complexity: "Medium" },
+            { name: "Ekoru", cat: "Search", desc: "Eco-friendly search engine.", url: "https://ekoru.org", complexity: "Low" },
+            { name: "GoodSearch", cat: "Search", desc: "Charity-focused search.", url: "https://goodsearch.com", complexity: "Low" },
+            { name: "Ecosia", cat: "Search", desc: "Tree-planting search engine.", url: "https://ecosia.org", complexity: "Low" },
+            { name: "You.com", cat: "Search", desc: "AI-powered search engine.", url: "https://you.com", complexity: "Medium" },
+            { name: "Yep", cat: "Search", desc: "Ahrefs search engine.", url: "https://yep.com", complexity: "Medium" },
+            { name: "Givero", cat: "Search", desc: "Charity search engine.", url: "https://givero.com", complexity: "Low" },
+            { name: "Mojeek UK", cat: "Search", desc: "UK-based search engine.", url: "https://mojeek.co.uk", complexity: "Low" },
+            { name: "Infinity Search", cat: "Search", desc: "Privacy search engine.", url: "https://infinitysearch.co", complexity: "Low" },
+            { name: "Swisscows Search", cat: "Search", desc: "Family-safe semantic search.", url: "https://swisscows.com", complexity: "Low" },
+            { name: "Oscobo Search", cat: "Search", desc: "Privacy-first search.", url: "https://oscobo.com", complexity: "Low" },
+
+            // --- 32. IDENTITY, PHONE & BACKGROUND ---
+            { name: "FastBackgroundCheck", cat: "People", desc: "Fast background checks.", url: "https://fastbackgroundcheck.com", complexity: "Low" },
+            { name: "Radaris API", cat: "People", desc: "Public records API.", url: "https://radaris.com", complexity: "Medium" },
+            { name: "CocoFinder Pro", cat: "People", desc: "Advanced people search.", url: "https://cocofinder.com", complexity: "Medium" },
+            { name: "PeopleByName", cat: "People", desc: "Search by name.", url: "https://peoplebyname.com", complexity: "Low" },
+            { name: "Yasni API", cat: "People", desc: "Person search API.", url: "https://yasni.com", complexity: "Medium" },
+            { name: "Veriphone", cat: "Phone", desc: "Phone validation API.", url: "https://veriphone.io", complexity: "Medium" },
+            { name: "Numverify API", cat: "Phone", desc: "Phone number validation.", url: "https://numverify.com", complexity: "Low" },
+            { name: "WhoCallsMe", cat: "Phone", desc: "Spam call lookup.", url: "https://whocallsme.com", complexity: "Low" },
+            { name: "800Notes", cat: "Phone", desc: "Caller ID community.", url: "https://800notes.com", complexity: "Low" },
+            { name: "PhoneOwner", cat: "Phone", desc: "Reverse phone lookup.", url: "https://phoneowner.com", complexity: "Low" },
+            { name: "Sync.me Lookup", cat: "Phone", desc: "Caller ID lookup.", url: "https://sync.me", complexity: "Low" },
+            { name: "Truecaller Business", cat: "Phone", desc: "Business caller ID.", url: "https://truecaller.com", complexity: "Low" },
+            { name: "CallerSmart", cat: "Phone", desc: "Community caller ID.", url: "https://callersmart.com", complexity: "Low" },
+            { name: "PhoneReveal", cat: "Phone", desc: "Phone number lookup.", url: "https://phonereveal.com", complexity: "Low" },
+            { name: "ReversePhoneCheck", cat: "Phone", desc: "Reverse phone search.", url: "https://reversephonecheck.com", complexity: "Low" },
+            { name: "USPhoneBook", cat: "Phone", desc: "US phone directory.", url: "https://usphonebook.com", complexity: "Low" },
+            { name: "AddressSearch", cat: "People", desc: "Address lookup tool.", url: "https://addresssearch.com", complexity: "Low" },
+            { name: "SmartBackgroundChecks", cat: "People", desc: "Background check platform.", url: "https://smartbackgroundchecks.com", complexity: "Medium" },
+            { name: "PeopleSmart", cat: "People", desc: "People search platform.", url: "https://peoplesmart.com", complexity: "Low" },
+
+            // --- 33. EMAIL & CONTACT INTELLIGENCE ---
+            { name: "EmailChecker", cat: "Email", desc: "Email verification service.", url: "https://emailchecker.com", complexity: "Low" },
+            { name: "MailboxValidator", cat: "Email", desc: "Email validation tool.", url: "https://mailboxvalidator.com", complexity: "Low" },
+            { name: "VerifyBee", cat: "Email", desc: "Email verifier.", url: "https://verifybee.com", complexity: "Low" },
+            { name: "Kickbox", cat: "Email", desc: "Email verification API.", url: "https://kickbox.com", complexity: "Medium" },
+            { name: "Mailgun Validate", cat: "Email", desc: "Mailgun email validation.", url: "https://mailgun.com", complexity: "Medium" },
+            { name: "ZeroBounce", cat: "Email", desc: "Email validation platform.", url: "https://zerobounce.net", complexity: "Medium" },
+            { name: "NeverBounce", cat: "Email", desc: "Real-time email verification.", url: "https://neverbounce.com", complexity: "Medium" },
+            { name: "BriteVerify", cat: "Email", desc: "Email address verification.", url: "https://briteverify.com", complexity: "Medium" },
+            { name: "EmailListVerify", cat: "Email", desc: "Bulk email verification.", url: "https://emaillistverify.com", complexity: "Medium" },
+            { name: "Snov Verify", cat: "Email", desc: "Email verifier tool.", url: "https://snov.io", complexity: "Low" },
+            { name: "Clearout", cat: "Email", desc: "Email verification service.", url: "https://clearout.io", complexity: "Medium" },
+            { name: "Mailfloss", cat: "Email", desc: "Email cleaner.", url: "https://mailfloss.com", complexity: "Low" },
+            { name: "BulkEmailVerifier", cat: "Email", desc: "Batch email validator.", url: "https://bulkemailverifier.com", complexity: "Low" },
+            { name: "VerifyKit", cat: "Email", desc: "Email verification API.", url: "https://verifykit.com", complexity: "Medium" },
+            { name: "CaptainVerify", cat: "Email", desc: "Email verification.", url: "https://captainverify.com", complexity: "Low" },
+            { name: "MailerCheck", cat: "Email", desc: "Email validation.", url: "https://mailercheck.com", complexity: "Low" },
+            { name: "Experian Email Check", cat: "Email", desc: "Credit bureau email check.", url: "https://experian.com", complexity: "High" },
+            { name: "Hunter Verify API", cat: "Email", desc: "Hunter email verification.", url: "https://hunter.io", complexity: "Medium" },
+            { name: "Anymail Verify", cat: "Email", desc: "Anymail verification.", url: "https://anymailfinder.com", complexity: "Low" },
+            { name: "QuickEmailVerification", cat: "Email", desc: "Fast email validation.", url: "https://quickemailverification.com", complexity: "Low" },
+
+            // --- 34. DOMAIN, HOSTING & CERTIFICATES ---
+            { name: "SecurityHeaders", cat: "Domain", desc: "Security header analyzer.", url: "https://securityheaders.com", complexity: "Low" },
+            { name: "SSL Labs", cat: "Domain", desc: "SSL server test.", url: "https://ssllabs.com", complexity: "Medium" },
+            { name: "crt.sh Extended", cat: "Domain", desc: "Certificate transparency.", url: "https://crt.sh", complexity: "Medium" },
+            { name: "Censys Cert Search", cat: "Network", desc: "Certificate search.", url: "https://search.censys.io", complexity: "Medium" },
+            { name: "CertDB", cat: "Domain", desc: "Certificate database.", url: "https://certdb.com", complexity: "Medium" },
+            { name: "DNSViz", cat: "Domain", desc: "DNS visualization.", url: "https://dnsviz.net", complexity: "High" },
+            { name: "DNSMap", cat: "Domain", desc: "DNS mapping tool.", url: "https://dnsmap.io", complexity: "Medium" },
+            { name: "DNSRecon", cat: "Domain", desc: "DNS reconnaissance.", url: "https://github.com/darkoperator/dnsrecon", complexity: "High" },
+            { name: "DNSBrute", cat: "Domain", desc: "DNS brute forcer.", url: "https://github.com", complexity: "High" },
+            { name: "Subjack", cat: "Domain", desc: "Subdomain takeover.", url: "https://github.com/haccer/subjack", complexity: "High" },
+            { name: "Takeover", cat: "Domain", desc: "Subdomain takeover tool.", url: "https://github.com", complexity: "High" },
+            { name: "Host.io", cat: "Domain", desc: "Hosting information.", url: "https://host.io", complexity: "Low" },
+            { name: "BuiltWith Trends", cat: "Domain", desc: "Tech trend analysis.", url: "https://trends.builtwith.com", complexity: "Low" },
+            { name: "Netlas Search", cat: "Network", desc: "Network search engine.", url: "https://netlas.io", complexity: "Medium" },
+            { name: "FOFA API", cat: "Network", desc: "Cyberspace mapping API.", url: "https://fofa.info", complexity: "High" },
+            { name: "LeakIX Scan", cat: "Breach", desc: "Leak scanning platform.", url: "https://leakix.net", complexity: "Medium" },
+            { name: "Onyphe", cat: "Network", desc: "Threat intelligence search.", url: "https://onyphe.io", complexity: "Medium" },
+            { name: "ZoomEye China", cat: "Network", desc: "Chinese device search.", url: "https://zoomeye.org", complexity: "Medium" },
+            { name: "Hunter Subdomain", cat: "Domain", desc: "Subdomain finder.", url: "https://hunter.io", complexity: "Low" },
+            { name: "DNSHistory Pro", cat: "Domain", desc: "Historical DNS records.", url: "https://dnshistory.org", complexity: "Medium" },
+
+            // --- 35. SOCIAL MEDIA DEEP ANALYTICS ---
+            { name: "Exolyt", cat: "SOCMINT", desc: "TikTok analytics platform.", url: "https://exolyt.com", complexity: "Medium" },
+            { name: "Analisa", cat: "SOCMINT", desc: "Instagram insights.", url: "https://analisa.io", complexity: "Medium" },
+            { name: "Modash", cat: "SOCMINT", desc: "Influencer OSINT tool.", url: "https://modash.io", complexity: "Medium" },
+            { name: "Not Just Analytics", cat: "SOCMINT", desc: "Social analytics.", url: "https://notjustanalytics.com", complexity: "Low" },
+            { name: "IGBlade", cat: "SOCMINT", desc: "Instagram analytics.", url: "https://igblade.com", complexity: "Low" },
+            { name: "Popsters", cat: "SOCMINT", desc: "Content performance.", url: "https://popsters.com", complexity: "Low" },
+            { name: "SocialTracker", cat: "SOCMINT", desc: "Social media tracking.", url: "https://socialtracker.io", complexity: "Medium" },
+            { name: "Heepsy", cat: "SOCMINT", desc: "Influencer discovery.", url: "https://heepsy.com", complexity: "Medium" },
+            { name: "StoryClash", cat: "SOCMINT", desc: "Story analytics.", url: "https://storyclash.com", complexity: "Low" },
+            { name: "Meltwater", cat: "SOCMINT", desc: "Media monitoring.", url: "https://meltwater.com", complexity: "High" },
+            { name: "NetBase", cat: "SOCMINT", desc: "Social analytics.", url: "https://netbase.com", complexity: "High" },
+            { name: "Brand24", cat: "SOCMINT", desc: "Brand monitoring.", url: "https://brand24.com", complexity: "Medium" },
+            { name: "SocialGrep", cat: "SOCMINT", desc: "Reddit search tool.", url: "https://socialgrep.com", complexity: "Low" },
+            { name: "Pushshift", cat: "SOCMINT", desc: "Reddit data archive.", url: "https://pushshift.io", complexity: "Medium" },
+            { name: "Reddit Investigator", cat: "SOCMINT", desc: "Reddit user analyzer.", url: "https://reddit-user-analyser.netlify.app", complexity: "Low" },
+            { name: "Twitter Audit", cat: "SOCMINT", desc: "Twitter account audit.", url: "https://twitteraudit.com", complexity: "Low" },
+            { name: "TweetStats", cat: "SOCMINT", desc: "Tweet statistics.", url: "http://tweetstats.com", complexity: "Low" },
+            { name: "IGDownloader", cat: "SOCMINT", desc: "Instagram downloader.", url: "https://igdownloader.com", complexity: "Low" },
+            { name: "StoriesDown", cat: "SOCMINT", desc: "Download IG stories.", url: "https://storiesdown.com", complexity: "Low" },
+            { name: "SaveIG", cat: "SOCMINT", desc: "Save Instagram content.", url: "https://saveig.app", complexity: "Low" },
+
+            // --- 36. IMAGE, VIDEO & FILE FORENSICS ---
+            { name: "Exif Pilot", cat: "Images", desc: "EXIF metadata editor.", url: "https://colorpilot.com", complexity: "Medium" },
+            { name: "Metadata Cleaner", cat: "Images", desc: "Remove metadata.", url: "https://metadatacleaner.com", complexity: "Low" },
+            { name: "GIMP", cat: "Images", desc: "Image analysis tool.", url: "https://gimp.org", complexity: "Medium" },
+            { name: "ImageMagick", cat: "Images", desc: "Image processing.", url: "https://imagemagick.org", complexity: "High" },
+            { name: "JPEGsnoop Advanced", cat: "Images", desc: "JPEG forensics tool.", url: "https://impulseadventure.com", complexity: "High" },
+            { name: "Amped Authenticate", cat: "Images", desc: "Professional image forensics.", url: "https://ampedsoftware.com", complexity: "High" },
+            { name: "Izitru", cat: "Images", desc: "Image authenticity verification.", url: "https://izitru.com", complexity: "Medium" },
+            { name: "DeepFake-o-meter", cat: "Video", desc: "Deepfake detection.", url: "https://ai.meta.com", complexity: "High" },
+            { name: "Sensity API", cat: "Video", desc: "Deepfake detection API.", url: "https://sensity.ai", complexity: "High" },
+            { name: "VideoVerifier", cat: "Video", desc: "Video verification.", url: "https://videoverifier.com", complexity: "Medium" },
+            { name: "InVID CLI", cat: "Video", desc: "Video verification CLI.", url: "https://www.invid-project.eu", complexity: "Medium" },
+            { name: "FFprobe", cat: "Video", desc: "Media analyzer.", url: "https://ffmpeg.org/ffprobe.html", complexity: "High" },
+            { name: "MediaInfo CLI", cat: "Video", desc: "Media metadata tool.", url: "https://mediaarea.net", complexity: "Low" },
+            { name: "AudioTag", cat: "Audio", desc: "Audio identification.", url: "https://audiotag.info", complexity: "Low" },
+            { name: "Shazam", cat: "Audio", desc: "Audio recognition.", url: "https://www.shazam.com", complexity: "Low" },
+            { name: "ACRCloud", cat: "Audio", desc: "Audio recognition API.", url: "https://www.acrcloud.com", complexity: "Medium" },
+            { name: "Sonic Annotator", cat: "Audio", desc: "Audio feature extraction.", url: "https://code.soundsoftware.ac.uk", complexity: "High" },
+            { name: "Deepware Desktop", cat: "Video", desc: "Deepfake detection app.", url: "https://deepware.ai", complexity: "High" },
+            { name: "FakeCatcher", cat: "Video", desc: "Intel deepfake detector.", url: "https://fake-catcher.azurewebsites.net", complexity: "High" },
+
+            // --- 37. GEOINT EXPERT TOOLS ---
+            { name: "EO Browser Advanced", cat: "GEOINT", desc: "Satellite imagery browser.", url: "https://apps.sentinel-hub.com", complexity: "Medium" },
+            { name: "Sentinel EO Hub", cat: "GEOINT", desc: "Earth observation hub.", url: "https://sentinel-hub.com", complexity: "High" },
+            { name: "NASA FIRMS", cat: "GEOINT", desc: "Fire tracking data.", url: "https://firms.modaps.eosdis.nasa.gov", complexity: "Medium" },
+            { name: "EarthExplorer", cat: "GEOINT", desc: "USGS earth explorer.", url: "https://earthexplorer.usgs.gov", complexity: "Medium" },
+            { name: "USGS Maps", cat: "GEOINT", desc: "US geological maps.", url: "https://maps.usgs.gov", complexity: "Low" },
+            { name: "OpenWeatherMap API", cat: "GEOINT", desc: "Weather data API.", url: "https://openweathermap.org", complexity: "Low" },
+            { name: "Ventusky", cat: "GEOINT", desc: "Weather visualization.", url: "https://ventusky.com", complexity: "Low" },
+            { name: "RainViewer Pro", cat: "GEOINT", desc: "Radar map API.", url: "https://rainviewer.com", complexity: "Low" },
+            { name: "MarineTraffic API", cat: "GEOINT", desc: "Maritime data API.", url: "https://marinetraffic.com", complexity: "Medium" },
+            { name: "VesselFinder API", cat: "GEOINT", desc: "Ship tracking API.", url: "https://vesselfinder.com", complexity: "Medium" },
+            { name: "ADS-B API", cat: "GEOINT", desc: "Flight data API.", url: "https://adsbexchange.com", complexity: "Medium" },
+            { name: "PlaneFinder API", cat: "GEOINT", desc: "Aircraft tracking API.", url: "https://planefinder.net", complexity: "Medium" },
+            { name: "OpenSky Network", cat: "GEOINT", desc: "Open aviation data.", url: "https://opensky-network.org", complexity: "Medium" },
+            { name: "SkyGlass", cat: "GEOINT", desc: "Aviation analytics.", url: "https://skyglass.app", complexity: "Medium" },
+            { name: "Google Sunroof", cat: "GEOINT", desc: "Solar potential data.", url: "https://sunroof.googleproject.com", complexity: "Low" },
+            { name: "PeakFinder App", cat: "GEOINT", desc: "Mountain identification.", url: "https://peakfinder.com", complexity: "Low" },
+            { name: "Hillmap", cat: "GEOINT", desc: "Terrain mapping.", url: "https://hillmap.com", complexity: "Low" },
+            { name: "CalTopo Advanced", cat: "GEOINT", desc: "Topographic mapping.", url: "https://caltopo.com", complexity: "Medium" },
+            { name: "GeoNames", cat: "GEOINT", desc: "Geographic database.", url: "https://geonames.org", complexity: "Low" },
+            { name: "What3Words", cat: "GEOINT", desc: "3-word location system.", url: "https://what3words.com", complexity: "Low" },
+
+            // --- 38. DATA MINING & CORRELATION ---
+            { name: "Pandas", cat: "Data Mining", desc: "Python data analysis.", url: "https://pandas.pydata.org", complexity: "High" },
+            { name: "NumPy", cat: "Data Mining", desc: "Python numerical computing.", url: "https://numpy.org", complexity: "High" },
+            { name: "Scikit-learn", cat: "Data Mining", desc: "Machine learning library.", url: "https://scikit-learn.org", complexity: "High" },
+            { name: "Jupyter Notebook", cat: "Data Mining", desc: "Interactive computing.", url: "https://jupyter.org", complexity: "Medium" },
+            { name: "Apache Spark", cat: "Data Mining", desc: "Big data processing.", url: "https://spark.apache.org", complexity: "High" },
+            { name: "Hadoop", cat: "Data Mining", desc: "Big data framework.", url: "https://hadoop.apache.org", complexity: "High" },
+            { name: "Neo4j", cat: "Data Mining", desc: "Graph database.", url: "https://neo4j.com", complexity: "High" },
+            { name: "OrientDB", cat: "Data Mining", desc: "Multi-model database.", url: "https://orientdb.com", complexity: "High" },
+            { name: "ArangoDB", cat: "Data Mining", desc: "Native graph DB.", url: "https://arangodb.com", complexity: "High" },
+            { name: "Graphistry", cat: "Data Mining", desc: "GPU graph visualization.", url: "https://graphistry.com", complexity: "High" },
+            { name: "Linkurious", cat: "Data Mining", desc: "Graph exploration.", url: "https://linkurious.com", complexity: "High" },
+            { name: "Maltego XL", cat: "Data Mining", desc: "Advanced link analysis.", url: "https://maltego.com", complexity: "High" },
+            { name: "IBM i2 Analyst Notebook", cat: "Data Mining", desc: "Intelligence analysis.", url: "https://ibm.com/i2", complexity: "High" },
+            { name: "CaseBoard", cat: "Data Mining", desc: "Investigation platform.", url: "https://caseboard.com", complexity: "High" },
+            { name: "OpenText Magellan", cat: "Data Mining", desc: "AI analytics platform.", url: "https://opentext.com", complexity: "High" },
+            { name: "RapidMiner Studio", cat: "Data Mining", desc: "Data science platform.", url: "https://rapidminer.com", complexity: "Medium" },
+            { name: "KNIME Analytics", cat: "Data Mining", desc: "Data analytics platform.", url: "https://knime.com", complexity: "Medium" },
+            { name: "PowerBI Pro", cat: "Data Mining", desc: "Business intelligence.", url: "https://powerbi.microsoft.com", complexity: "Medium" },
+            { name: "Tableau Desktop", cat: "Data Mining", desc: "Data visualization.", url: "https://tableau.com", complexity: "Medium" },
+            { name: "Google Data Studio", cat: "Data Mining", desc: "Data reporting.", url: "https://datastudio.google.com", complexity: "Low" },
+
+            // --- 39. RECON & AUTOMATION ADVANCED ---
+            { name: "Sn0int", cat: "Recon", desc: "OSINT framework.", url: "https://github.com/kpcyrd/sn0int", complexity: "High" },
+            { name: "SpiderFoot HX", cat: "Recon", desc: "Automated OSINT.", url: "https://spiderfoot.net", complexity: "Medium" },
+            { name: "ReconDog", cat: "Recon", desc: "Reconnaissance tool.", url: "https://github.com", complexity: "High" },
+            { name: "BlackWidow", cat: "Recon", desc: "Web crawler.", url: "https://github.com/1N3/BlackWidow", complexity: "High" },
+            { name: "Photon Advanced", cat: "Recon", desc: "Fast web crawler.", url: "https://github.com/s0md3v/Photon", complexity: "High" },
+            { name: "GRecon", cat: "Recon", desc: "Google reconnaissance.", url: "https://github.com", complexity: "High" },
+            { name: "Infoga", cat: "Recon", desc: "Email recon tool.", url: "https://github.com/m4ll0k/Infoga", complexity: "High" },
+            { name: "CloudEnum", cat: "Recon", desc: "Cloud asset enumeration.", url: "https://github.com", complexity: "High" },
+            { name: "S3Scanner", cat: "Recon", desc: "AWS bucket scanner.", url: "https://github.com/sa7mon/S3Scanner", complexity: "High" },
+            { name: "BucketFinder", cat: "Recon", desc: "S3 bucket finder.", url: "https://github.com", complexity: "High" },
+            { name: "AWSBucketDump", cat: "Recon", desc: "AWS bucket dumper.", url: "https://github.com", complexity: "High" },
+            { name: "GitDorker", cat: "Recon", desc: "GitHub dorking tool.", url: "https://github.com", complexity: "High" },
+            { name: "TruffleHog", cat: "Recon", desc: "Secret finder.", url: "https://github.com/trufflesecurity/trufflehog", complexity: "High" },
+            { name: "GitLeaks", cat: "Recon", desc: "Git leak detection.", url: "https://github.com/zricethezav/gitleaks", complexity: "High" },
+            { name: "Repo-supervisor", cat: "Recon", desc: "Repo scanning tool.", url: "https://github.com", complexity: "High" },
+            { name: "SecretFinder", cat: "Recon", desc: "API key finder.", url: "https://github.com", complexity: "High" },
+            { name: "JSParser", cat: "Recon", desc: "JS file parser.", url: "https://github.com", complexity: "High" },
+            { name: "LinkFinder", cat: "Recon", desc: "Endpoint finder.", url: "https://github.com", complexity: "High" },
+            { name: "ParamMiner", cat: "Recon", desc: "Parameter miner.", url: "https://github.com", complexity: "High" },
+            { name: "Dalfox", cat: "Recon", desc: "XSS scanner.", url: "https://github.com/hahwul/dalfox", complexity: "High" },
+
+            // --- 40. INTELLIGENCE & MONITORING PLATFORMS ---
+            { name: "Hootsuite", cat: "SOCMINT", desc: "Social media management.", url: "https://hootsuite.com", complexity: "Medium" },
+            { name: "Buffer", cat: "SOCMINT", desc: "Social scheduling.", url: "https://buffer.com", complexity: "Low" },
+            { name: "Feedly", cat: "SOCMINT", desc: "RSS feed aggregator.", url: "https://feedly.com", complexity: "Low" },
+            { name: "Inoreader", cat: "SOCMINT", desc: "Feed reader.", url: "https://inoreader.com", complexity: "Low" },
+            { name: "NetNewsWire", cat: "SOCMINT", desc: "RSS reader.", url: "https://netnewswire.com", complexity: "Low" },
+            { name: "Flipboard", cat: "SOCMINT", desc: "Content aggregator.", url: "https://flipboard.com", complexity: "Low" },
+            { name: "Google Alerts", cat: "SOCMINT", desc: "Alert monitoring.", url: "https://google.com/alerts", complexity: "Low" },
+            { name: "Talkwalker Alerts", cat: "SOCMINT", desc: "Brand alerts.", url: "https://talkwalker.com", complexity: "Medium" },
+            { name: "Mention Alerts", cat: "SOCMINT", desc: "Mention monitoring.", url: "https://mention.com", complexity: "Medium" },
+            { name: "CrowdTangle", cat: "SOCMINT", desc: "Meta social monitoring.", url: "https://crowdtangle.com", complexity: "Medium" },
+            { name: "Meltwater Alerts", cat: "SOCMINT", desc: "Media alerts.", url: "https://meltwater.com", complexity: "Medium" },
+            { name: "Dataminr Pulse", cat: "Threat Intel", desc: "Real-time alerts.", url: "https://dataminr.com", complexity: "High" },
+            { name: "NewsNow", cat: "SOCMINT", desc: "News aggregation.", url: "https://newsnow.com", complexity: "Low" },
+            { name: "GDELT", cat: "Data Mining", desc: "Global news database.", url: "https://gdeltproject.org", complexity: "Medium" },
+            { name: "EventRegistry", cat: "Data Mining", desc: "News API.", url: "https://eventregistry.org", complexity: "Medium" },
+            { name: "AYLIEN News API", cat: "Data Mining", desc: "News analysis API.", url: "https://aylien.com", complexity: "High" },
+            { name: "ContextualWeb API", cat: "Data Mining", desc: "News API.", url: "https://contextualweb.io", complexity: "Medium" },
+            { name: "Diffbot", cat: "Data Mining", desc: "Web data extraction.", url: "https://diffbot.com", complexity: "High" },
+            { name: "Import.io", cat: "Data Mining", desc: "Web scraping platform.", url: "https://import.io", complexity: "Medium" },
+            { name: "ParseHub", cat: "Data Mining", desc: "Web scraping tool.", url: "https://parsehub.com", complexity: "Medium" },
+
+            // --- 41. FILE & DOCUMENT SEARCH ---
+            { name: "MetaCrawler", cat: "Search", desc: "Meta search engine.", url: "https://metacrawler.com", complexity: "Low" },
+            { name: "Info.com", cat: "Search", desc: "Aggregated search.", url: "https://info.com", complexity: "Low" },
+            { name: "WebCrawler", cat: "Search", desc: "Classic web search.", url: "https://webcrawler.com", complexity: "Low" },
+            { name: "Excite", cat: "Search", desc: "Portal search engine.", url: "https://excite.com", complexity: "Low" },
+            { name: "Dogpile Images", cat: "Search", desc: "Image search aggregator.", url: "https://dogpile.com/images", complexity: "Low" },
+            { name: "Yandex Search", cat: "Search", desc: "Russian search engine.", url: "https://yandex.com", complexity: "Low" },
+            { name: "Brave Image Search", cat: "Search", desc: "Image search.", url: "https://search.brave.com/images", complexity: "Low" },
+            { name: "Qwant Maps", cat: "Search", desc: "European maps.", url: "https://qwant.com/maps", complexity: "Low" },
+            { name: "Ecosia Maps", cat: "Search", desc: "Eco-friendly maps.", url: "https://ecosia.org/maps", complexity: "Low" },
+            { name: "YouCode", cat: "Search", desc: "Code search engine.", url: "https://you.com/code", complexity: "Medium" },
+            { name: "Grep.app", cat: "Search", desc: "Code search.", url: "https://grep.app", complexity: "Medium" },
+            { name: "PublicWWW API", cat: "Search", desc: "Source code search API.", url: "https://publicwww.com", complexity: "High" },
+            { name: "Searchcode API", cat: "Search", desc: "Code search API.", url: "https://searchcode.com", complexity: "Medium" },
+            { name: "GrayHatWarfare", cat: "Search", desc: "Open S3 buckets.", url: "https://grayhatwarfare.com", complexity: "High" },
+            { name: "FileChef", cat: "Search", desc: "File search engine.", url: "https://filechef.com", complexity: "Low" },
+            { name: "Library Genesis", cat: "Search", desc: "E-book library.", url: "https://libgen.rs", complexity: "Medium" },
+            { name: "ZLibrary", cat: "Search", desc: "Digital library.", url: "https://zlibrary.to", complexity: "Medium" },
+            { name: "PDFDrive", cat: "Search", desc: "PDF search engine.", url: "https://pdfdrive.com", complexity: "Low" },
+            { name: "SlideShare", cat: "Search", desc: "Presentation sharing.", url: "https://slideshare.net", complexity: "Low" },
+            { name: "Issuu", cat: "Search", desc: "Document sharing.", url: "https://issuu.com", complexity: "Low" },
+            { name: "Academia.edu", cat: "Search", desc: "Academic papers.", url: "https://academia.edu", complexity: "Low" },
+            { name: "ResearchGate", cat: "Search", desc: "Research network.", url: "https://researchgate.net", complexity: "Low" },
+            { name: "OpenAccessButton", cat: "Search", desc: "Open access finder.", url: "https://openaccessbutton.com", complexity: "Low" },
+            { name: "CORE API", cat: "Search", desc: "Research API.", url: "https://core.ac.uk", complexity: "Medium" },
+            { name: "WorldCat", cat: "Search", desc: "Library catalog.", url: "https://worldcat.org", complexity: "Low" },
+            { name: "OpenLibrary", cat: "Search", desc: "Open book library.", url: "https://openlibrary.org", complexity: "Low" },
+            { name: "DOAJ", cat: "Search", desc: "Open access journals.", url: "https://doaj.org", complexity: "Low" },
+            { name: "Zenodo", cat: "Data Mining", desc: "Research data repository.", url: "https://zenodo.org", complexity: "Low" },
+            { name: "Figshare", cat: "Data Mining", desc: "Data sharing platform.", url: "https://figshare.com", complexity: "Low" },
+
+            // --- 42. IDENTITY, PEOPLE & RECORDS ---
+            { name: "PeekYou Pro", cat: "People", desc: "Advanced people search.", url: "https://peekyou.com", complexity: "Medium" },
+            { name: "Pipl API", cat: "People", desc: "Identity search API.", url: "https://pipl.com", complexity: "Medium" },
+            { name: "BeenVerified API", cat: "People", desc: "Background check API.", url: "https://beenverified.com", complexity: "Medium" },
+            { name: "Spokeo API", cat: "People", desc: "People search API.", url: "https://spokeo.com", complexity: "Medium" },
+            { name: "PeopleDataLabs", cat: "People", desc: "People data API.", url: "https://peopledatalabs.com", complexity: "High" },
+            { name: "FullContact", cat: "People", desc: "Identity enrichment.", url: "https://fullcontact.com", complexity: "Medium" },
+            { name: "Clearbit Enrichment", cat: "People", desc: "Company data API.", url: "https://clearbit.com", complexity: "Medium" },
+            { name: "Hunter Enrichment", cat: "Email", desc: "Email enrichment.", url: "https://hunter.io", complexity: "Medium" },
+            { name: "Apollo.io", cat: "People", desc: "B2B data platform.", url: "https://apollo.io", complexity: "Medium" },
+            { name: "RocketReach API", cat: "People", desc: "Contact data API.", url: "https://rocketreach.co", complexity: "Medium" },
+            { name: "ZoomInfo", cat: "People", desc: "B2B contact database.", url: "https://zoominfo.com", complexity: "High" },
+            { name: "Lusha API", cat: "People", desc: "Contact API.", url: "https://lusha.com", complexity: "Medium" },
+            { name: "ContactOut API", cat: "People", desc: "LinkedIn API.", url: "https://contactout.com", complexity: "Medium" },
+            { name: "LeadIQ", cat: "People", desc: "Lead generation.", url: "https://leadiq.com", complexity: "Medium" },
+            { name: "Snov Enrichment", cat: "Email", desc: "Email enrichment.", url: "https://snov.io", complexity: "Low" },
+            { name: "Cognism", cat: "People", desc: "B2B data platform.", url: "https://cognism.com", complexity: "High" },
+            { name: "Kaspr", cat: "People", desc: "Lead data.", url: "https://kaspr.io", complexity: "Medium" },
+            { name: "Seamless.ai", cat: "People", desc: "AI lead generation.", url: "https://seamless.ai", complexity: "Medium" },
+            { name: "PeopleFinder API", cat: "People", desc: "People search API.", url: "https://peoplefinder.com", complexity: "Low" },
+            { name: "ZabaSearch API", cat: "People", desc: "US people API.", url: "https://zabasearch.com", complexity: "Low" },
+            { name: "Radaris Pro", cat: "People", desc: "Advanced people search.", url: "https://radaris.com", complexity: "Medium" },
+            { name: "CocoFinder API", cat: "People", desc: "API for people data.", url: "https://cocofinder.com", complexity: "Medium" },
+            { name: "Whitepages API", cat: "People", desc: "Phone and address API.", url: "https://whitepages.com", complexity: "Low" },
+            { name: "Truecaller API", cat: "Phone", desc: "Caller ID API.", url: "https://truecaller.com", complexity: "Medium" },
+            { name: "Sync.me API", cat: "Phone", desc: "Phone API.", url: "https://sync.me", complexity: "Low" },
+            { name: "NumLookup API", cat: "Phone", desc: "Phone lookup API.", url: "https://numlookup.com", complexity: "Low" },
+            { name: "PhoneInfoga Pro", cat: "Phone", desc: "Advanced phone OSINT.", url: "https://github.com/sundowndev/phoneinfoga", complexity: "High" },
+            { name: "OpenCorporates API", cat: "Business", desc: "Company data API.", url: "https://opencorporates.com", complexity: "Medium" },
+            { name: "Aleph API", cat: "Data Mining", desc: "Investigation DB API.", url: "https://aleph.occrp.org", complexity: "Medium" },
+            { name: "LittleSis API", cat: "Data Mining", desc: "Network data API.", url: "https://littlesis.org", complexity: "Medium" },
+
+            // --- 43. EMAIL, USERNAME & LEAK CORRELATION ---
+            { name: "Epieos API", cat: "Email", desc: "Email profile API.", url: "https://epieos.com", complexity: "Medium" },
+            { name: "DeHashed API", cat: "Email", desc: "Breach search API.", url: "https://dehashed.com", complexity: "High" },
+            { name: "LeakCheck API", cat: "Email", desc: "Leak lookup API.", url: "https://leakcheck.io", complexity: "Medium" },
+            { name: "Snusbase API", cat: "Breach", desc: "Breach DB API.", url: "https://snusbase.com", complexity: "Medium" },
+            { name: "IntelligenceX API", cat: "Search", desc: "Search API.", url: "https://intelx.io", complexity: "Medium" },
+            { name: "HudsonRock", cat: "Threat Intel", desc: "Credential monitoring.", url: "https://hudsonrock.com", complexity: "High" },
+            { name: "BreachDirectory", cat: "Email", desc: "Breach directory.", url: "https://breachdirectory.org", complexity: "Medium" },
+            { name: "LeakPeek API", cat: "Email", desc: "Leak search API.", url: "https://leakpeek.com", complexity: "Medium" },
+            { name: "GhostProject", cat: "Breach", desc: "Breach database mirror.", url: "https://ghostproject.fr", complexity: "Medium" },
+            { name: "EmailRep API", cat: "Email", desc: "Email reputation API.", url: "https://emailrep.io", complexity: "Medium" },
+            { name: "HaveIBeenPwned API", cat: "Email", desc: "Breach check API.", url: "https://haveibeenpwned.com", complexity: "Medium" },
+            { name: "Maigret", cat: "People", desc: "Username scanner.", url: "https://github.com/soxoj/maigret", complexity: "High" },
+            { name: "Blackbird", cat: "People", desc: "Username search.", url: "https://github.com/p1ngul1n0/blackbird", complexity: "High" },
+            { name: "Social Analyzer", cat: "SOCMINT", desc: "Social profile analyzer.", url: "https://github.com/qeeqbox/social-analyzer", complexity: "High" },
+            { name: "UserRecon", cat: "People", desc: "Username recon.", url: "https://github.com/thelinuxchoice/userrecon", complexity: "High" },
+            { name: "InstaLooter", cat: "SOCMINT", desc: "Instagram scraper.", url: "https://github.com/akurtovic/InstaLooter", complexity: "High" },
+            { name: "GitHub Search Advanced", cat: "Recon", desc: "Advanced GitHub search.", url: "https://github.com/search", complexity: "Medium" },
+            { name: "GitLab Search", cat: "Recon", desc: "GitLab code search.", url: "https://gitlab.com", complexity: "Medium" },
+            { name: "Bitbucket Search", cat: "Recon", desc: "Code search.", url: "https://bitbucket.org", complexity: "Medium" },
+            { name: "Pastebin Search", cat: "Breach", desc: "Pastebin search.", url: "https://pastebin.com", complexity: "Low" },
+
+            // --- 44. INFRA, NETWORK & EXPOSURE ---
+            { name: "LeakIX API", cat: "Breach", desc: "Leak API.", url: "https://leakix.net", complexity: "Medium" },
+            { name: "Censys ASM", cat: "Network", desc: "Attack surface management.", url: "https://censys.io", complexity: "High" },
+            { name: "Shodan Monitor", cat: "Network", desc: "Device monitoring.", url: "https://shodan.io", complexity: "Medium" },
+            { name: "BinaryEdge API", cat: "Network", desc: "Threat API.", url: "https://binaryedge.io", complexity: "High" },
+            { name: "Netlas API", cat: "Network", desc: "Network API.", url: "https://netlas.io", complexity: "Medium" },
+            { name: "FOFA Pro", cat: "Network", desc: "Pro mapping tool.", url: "https://fofa.info", complexity: "High" },
+            { name: "ZoomEye API Pro", cat: "Network", desc: "Pro API.", url: "https://zoomeye.org", complexity: "High" },
+            { name: "Onyphe API", cat: "Network", desc: "Threat API.", url: "https://onyphe.io", complexity: "Medium" },
+            { name: "GreyNoise API", cat: "Threat Intel", desc: "Internet noise API.", url: "https://greynoise.io", complexity: "High" },
+            { name: "VirusTotal API", cat: "Threat Intel", desc: "Malware API.", url: "https://virustotal.com", complexity: "High" },
+            { name: "URLScan API", cat: "Threat Intel", desc: "URL scanner API.", url: "https://urlscan.io", complexity: "Medium" },
+            { name: "HybridAnalysis API", cat: "Threat Intel", desc: "Malware analysis API.", url: "https://hybrid-analysis.com", complexity: "High" },
+            { name: "AbuseIPDB API", cat: "Threat Intel", desc: "IP reputation API.", url: "https://abuseipdb.com", complexity: "Medium" },
+            { name: "ThreatFox", cat: "Threat Intel", desc: "IOC database.", url: "https://threatfox.abuse.ch", complexity: "Medium" },
+            { name: "MalwareBazaar", cat: "Threat Intel", desc: "Malware database.", url: "https://bazaar.abuse.ch", complexity: "Medium" },
+            { name: "URLHaus", cat: "Threat Intel", desc: "Malware URL DB.", url: "https://urlhaus.abuse.ch", complexity: "Medium" },
+            { name: "Feodo Tracker", cat: "Threat Intel", desc: "Botnet tracker.", url: "https://feodotracker.abuse.ch", complexity: "Medium" },
+            { name: "SSLMate Cert Spotter", cat: "Domain", desc: "Cert monitoring.", url: "https://certspotter.com", complexity: "Medium" },
+            { name: "CertStream", cat: "Domain", desc: "Cert monitoring.", url: "https://certstream.com", complexity: "Medium" },
+            { name: "DNSDB", cat: "Domain", desc: "Historical DNS.", url: "https://farsightsecurity.com", complexity: "High" },
+            { name: "PassiveTotal API", cat: "Network", desc: "Threat intel API.", url: "https://community.riskiq.com", complexity: "High" },
+            { name: "DomainTools API", cat: "Domain", desc: "WHOIS API.", url: "https://domaintools.com", complexity: "Medium" },
+            { name: "WhoisXML API", cat: "Domain", desc: "WHOIS API.", url: "https://whoisxmlapi.com", complexity: "Medium" },
+            { name: "IPinfo API", cat: "Network", desc: "IP data API.", url: "https://ipinfo.io", complexity: "Low" },
+            { name: "IPAPI", cat: "Network", desc: "IP geolocation API.", url: "https://ipapi.co", complexity: "Low" },
+            { name: "IPGeolocation", cat: "Network", desc: "IP location API.", url: "https://ipgeolocation.io", complexity: "Low" },
+            { name: "DB-IP", cat: "Network", desc: "IP database.", url: "https://db-ip.com", complexity: "Low" },
+            { name: "MaxMind GeoIP", cat: "Network", desc: "GeoIP database.", url: "https://maxmind.com", complexity: "Medium" },
+            { name: "Team Cymru IP tools", cat: "Network", desc: "Network tools.", url: "https://team-cymru.com", complexity: "High" },
+            { name: "BGPView", cat: "Network", desc: "BGP lookup.", url: "https://bgpview.io", complexity: "Medium" },
+
+            // --- 45. SOCIAL, COMMUNITIES & MONITORING ---
+            { name: "X Pro", cat: "SOCMINT", desc: "Twitter Pro dashboards.", url: "https://x.com", complexity: "Medium" },
+            { name: "Reddit API", cat: "SOCMINT", desc: "Reddit data API.", url: "https://www.reddit.com/dev/api", complexity: "Medium" },
+            { name: "Pushshift API", cat: "SOCMINT", desc: "Reddit archive API.", url: "https://pushshift.io", complexity: "Medium" },
+            { name: "CrowdTangle API", cat: "SOCMINT", desc: "Meta API.", url: "https://crowdtangle.com", complexity: "High" },
+            { name: "Facebook Graph API", cat: "SOCMINT", desc: "FB data API.", url: "https://developers.facebook.com", complexity: "High" },
+            { name: "Instagram Graph API", cat: "SOCMINT", desc: "IG data API.", url: "https://developers.facebook.com", complexity: "High" },
+            { name: "TikTok API", cat: "SOCMINT", desc: "TikTok unofficial API.", url: "https://tiktok.com", complexity: "High" },
+            { name: "YouTube API", cat: "SOCMINT", desc: "YT data API.", url: "https://developers.google.com/youtube", complexity: "High" },
+            { name: "Twitch API", cat: "SOCMINT", desc: "Twitch data API.", url: "https://dev.twitch.tv", complexity: "High" },
+            { name: "Discord Search Tools", cat: "SOCMINT", desc: "Discord search.", url: "https://discord.com", complexity: "Medium" },
+            { name: "Telegram OSINT Bots", cat: "SOCMINT", desc: "TG investigation bots.", url: "https://telegram.org", complexity: "Medium" },
+            { name: "TGStat", cat: "SOCMINT", desc: "Telegram stats.", url: "https://tgstat.com", complexity: "Low" },
+            { name: "Telemetr", cat: "SOCMINT", desc: "Telegram metrics.", url: "https://telemetr.io", complexity: "Low" },
+            { name: "Combot", cat: "SOCMINT", desc: "TG channel analytics.", url: "https://combot.org", complexity: "Low" },
+            { name: "Social Blade API", cat: "SOCMINT", desc: "Stats API.", url: "https://socialblade.com", complexity: "Medium" },
+            { name: "Brand24 API", cat: "SOCMINT", desc: "Brand monitoring API.", url: "https://brand24.com", complexity: "Medium" },
+            { name: "Talkwalker API", cat: "SOCMINT", desc: "Social API.", url: "https://talkwalker.com", complexity: "High" },
+            { name: "Meltwater API", cat: "SOCMINT", desc: "Media API.", url: "https://meltwater.com", complexity: "High" },
+            { name: "Sprinklr", cat: "SOCMINT", desc: "Social management.", url: "https://sprinklr.com", complexity: "High" },
+            { name: "NetBase API", cat: "SOCMINT", desc: "Social analytics API.", url: "https://netbase.com", complexity: "High" },
+
+            // --- 46. MEDIA, DEEPFAKE & FILE ANALYSIS ---
+            { name: "Forensically API", cat: "Images", desc: "Image forensics API.", url: "https://29a.ch", complexity: "Medium" },
+            { name: "FotoForensics API", cat: "Images", desc: "Forensics API.", url: "https://fotoforensics.com", complexity: "Medium" },
+            { name: "ExifTool CLI Advanced", cat: "Images", desc: "Advanced metadata tool.", url: "https://exiftool.org", complexity: "High" },
+            { name: "Metadata2Go API", cat: "Images", desc: "Metadata API.", url: "https://metadata2go.com", complexity: "Low" },
+            { name: "Ghiro API", cat: "Images", desc: "Forensics API.", url: "https://getghiro.org", complexity: "High" },
+            { name: "Amped Software Suite", cat: "Images", desc: "Professional forensics.", url: "https://ampedsoftware.com", complexity: "High" },
+            { name: "Deepware API", cat: "Video", desc: "Deepfake API.", url: "https://deepware.ai", complexity: "High" },
+            { name: "Sensity API", cat: "Video", desc: "Deepfake detection.", url: "https://sensity.ai", complexity: "High" },
+            { name: "Microsoft Azure Video Indexer", cat: "Video", desc: "Video AI.", url: "https://azure.microsoft.com", complexity: "High" },
+            { name: "Google Video AI", cat: "Video", desc: "Video analysis.", url: "https://cloud.google.com/video-intelligence", complexity: "High" },
+            { name: "AWS Rekognition", cat: "Images", desc: "Image analysis.", url: "https://aws.amazon.com/rekognition", complexity: "High" },
+            { name: "Face++ API", cat: "Images", desc: "Face recognition API.", url: "https://faceplusplus.com", complexity: "High" },
+            { name: "PimEyes API", cat: "Images", desc: "Face search API.", url: "https://pimeyes.com", complexity: "High" },
+            { name: "OpenFace", cat: "Images", desc: "Face recognition.", url: "https://github.com/cmusatyalab/gabriel", complexity: "High" },
+            { name: "DeepFace", cat: "Images", desc: "Python face recognition.", url: "https://github.com/serengil/deepface", complexity: "High" },
+            { name: "InsightFace", cat: "Images", desc: "Face analysis.", url: "https://github.com/deepinsight/insightface", complexity: "High" },
+            { name: "Dlib", cat: "Images", desc: "ML toolkit.", url: "http://dlib.net", complexity: "High" },
+            { name: "OpenCV", cat: "Images", desc: "Computer vision.", url: "https://opencv.org", complexity: "High" },
+            { name: "MediaPipe", cat: "Images", desc: "Face detection.", url: "https://mediapipe.dev", complexity: "High" },
+            { name: "Librosa", cat: "Audio", desc: "Audio analysis.", url: "https://librosa.org", complexity: "High" },
+
+            // --- 47. GEOINT, SATELLITE & TRACKING ---
+            { name: "Sentinel Hub API", cat: "GEOINT", desc: "Satellite API.", url: "https://sentinel-hub.com", complexity: "High" },
+            { name: "EO Browser API", cat: "GEOINT", desc: "Imagery API.", url: "https://apps.sentinel-hub.com", complexity: "Medium" },
+            { name: "NASA API", cat: "GEOINT", desc: "NASA open data.", url: "https://api.nasa.gov", complexity: "Medium" },
+            { name: "Google Maps API", cat: "GEOINT", desc: "Maps platform.", url: "https://cloud.google.com/maps-platform", complexity: "High" },
+            { name: "OpenStreetMap API", cat: "GEOINT", desc: "OSM data.", url: "https://www.openstreetmap.org", complexity: "Low" },
+            { name: "Mapbox API", cat: "GEOINT", desc: "Mapping platform.", url: "https://mapbox.com", complexity: "Medium" },
+            { name: "HERE Maps API", cat: "GEOINT", desc: "Location platform.", url: "https://here.com", complexity: "Medium" },
+            { name: "TomTom API", cat: "GEOINT", desc: "Maps API.", url: "https://tomtom.com", complexity: "Medium" },
+            { name: "Bing Maps API", cat: "GEOINT", desc: "Microsoft maps.", url: "https://bing.com/maps", complexity: "Medium" },
+            { name: "What3Words API", cat: "GEOINT", desc: "Location API.", url: "https://what3words.com", complexity: "Medium" },
+            { name: "GeoNames API", cat: "GEOINT", desc: "Geo data API.", url: "https://geonames.org", complexity: "Low" },
+            { name: "OpenCage Geocoder", cat: "GEOINT", desc: "Geocoding API.", url: "https://opencage.com", complexity: "Low" },
+            { name: "Nominatim API", cat: "GEOINT", desc: "OSM geocoder.", url: "https://nominatim.openstreetmap.org", complexity: "Low" },
+            { name: "Windy API", cat: "GEOINT", desc: "Weather API.", url: "https://openweathermap.org", complexity: "Low" },
+            { name: "Weatherbit API", cat: "GEOINT", desc: "Weather data.", url: "https://weatherbit.io", complexity: "Low" },
+            { name: "ADS-B Exchange API", cat: "GEOINT", desc: "Flight API.", url: "https://adsbexchange.com", complexity: "Medium" },
+            { name: "FlightRadar API", cat: "GEOINT", desc: "Flight data.", url: "https://flightradar24.com", complexity: "Medium" },
+            { name: "MarineTraffic API", cat: "GEOINT", desc: "Maritime API.", url: "https://marinetraffic.com", complexity: "Medium" },
+            { name: "VesselFinder API", cat: "GEOINT", desc: "Ship API.", url: "https://vesselfinder.com", complexity: "Medium" },
+            { name: "OpenSky API", cat: "GEOINT", desc: "Aviation data.", url: "https://opensky-network.org", complexity: "Medium" },
+
+            // --- 48. DATA CORRELATION, GRAPH & AI ---
+            { name: "Neo4j Aura", cat: "Data Mining", desc: "Cloud graph DB.", url: "https://neo4j.com", complexity: "High" },
+            { name: "ArangoDB Graph", cat: "Data Mining", desc: "Graph database.", url: "https://arangodb.com", complexity: "High" },
+            { name: "TigerGraph", cat: "Data Mining", desc: "Graph analytics.", url: "https://tigergraph.com", complexity: "High" },
+            { name: "Amazon Neptune", cat: "Data Mining", desc: "AWS graph DB.", url: "https://aws.amazon.com/neptune", complexity: "High" },
+            { name: "Graphistry GPU", cat: "Data Mining", desc: "GPU visualization.", url: "https://graphistry.com", complexity: "High" },
+            { name: "Linkurious Enterprise", cat: "Data Mining", desc: "Graph platform.", url: "https://linkurious.com", complexity: "High" },
+            { name: "Maltego Server", cat: "Data Mining", desc: "Enterprise link analysis.", url: "https://maltego.com", complexity: "High" },
+            { name: "i2 Analyst Notebook", cat: "Data Mining", desc: "Investigation tool.", url: "https://ibm.com/i2", complexity: "High" },
+            { name: "Palantir Foundry", cat: "Data Mining", desc: "Data platform.", url: "https://palantir.com", complexity: "High" },
+            { name: "Kumu API", cat: "Data Mining", desc: "Relationship mapping.", url: "https://kumu.io", complexity: "Medium" },
+            { name: "Gephi Toolkit", cat: "Data Mining", desc: "Visualization SDK.", url: "https://gephi.org", complexity: "High" },
+            { name: "Cytoscape Plugins", cat: "Data Mining", desc: "Network plugins.", url: "https://cytoscape.org", complexity: "High" },
+            { name: "NetworkX", cat: "Data Mining", desc: "Python networking.", url: "https://networkx.org", complexity: "High" },
+            { name: "SciPy", cat: "Data Mining", desc: "Scientific computing.", url: "https://scipy.org", complexity: "High" },
+            { name: "Scikit-learn Pipelines", cat: "Data Mining", desc: "ML pipelines.", url: "https://scikit-learn.org", complexity: "High" },
+            { name: "TensorFlow", cat: "Data Mining", desc: "ML framework.", url: "https://tensorflow.org", complexity: "High" },
+            { name: "PyTorch", cat: "Data Mining", desc: "Deep learning.", url: "https://pytorch.org", complexity: "High" },
+            { name: "HuggingFace Transformers", cat: "Data Mining", desc: "NLP models.", url: "https://huggingface.co", complexity: "High" },
+            { name: "SpaCy NLP", cat: "Data Mining", desc: "NLP library.", url: "https://spacy.io", complexity: "High" },
+            { name: "NLTK", cat: "Data Mining", desc: "NLP toolkit.", url: "https://nltk.org", complexity: "Medium" },
+
+            // --- 49. RECON, AUTOMATION & OFFENSIVE OSINT ---
+            { name: "Nuclei Templates", cat: "Recon", desc: "Vulnerability templates.", url: "https://github.com/projectdiscovery/nuclei-templates", complexity: "High" },
+            { name: "ProjectDiscovery Suite", cat: "Recon", desc: "Recon toolkit.", url: "https://github.com/projectdiscovery", complexity: "High" },
+            { name: "Subfinder API", cat: "Recon", desc: "Subdomain API.", url: "https://github.com/projectdiscovery/subfinder", complexity: "High" },
+            { name: "httpx API", cat: "Recon", desc: "HTTP probing API.", url: "https://github.com/projectdiscovery/httpx", complexity: "High" },
+            { name: "Katana Crawler", cat: "Recon", desc: "Advanced crawler.", url: "https://github.com/projectdiscovery/katana", complexity: "High" },
+            { name: "FFUF Advanced", cat: "Recon", desc: "Fuzzing tool.", url: "https://github.com/ffuf/ffuf", complexity: "High" },
+            { name: "Gobuster Advanced", cat: "Recon", desc: "Directory busting.", url: "https://github.com/OJ/gobuster", complexity: "High" },
+            { name: "Dirsearch Advanced", cat: "Recon", desc: "Web scanner.", url: "https://github.com/maurosoria/dirsearch", complexity: "High" },
+            { name: "ParamSpider Forks", cat: "Recon", desc: "Parameter mining.", url: "https://github.com/devanshbatham/ParamSpider", complexity: "High" },
+            { name: "Arjun Advanced", cat: "Recon", desc: "Parameter discovery.", url: "https://github.com/s0md3v/Arjun", complexity: "High" },
+            { name: "Dalfox XSS", cat: "Recon", desc: "XSS scanner.", url: "https://github.com/hahwul/dalfox", complexity: "High" },
+            { name: "XSStrike", cat: "Recon", desc: "XSS detection.", url: "https://github.com/s0md3v/XSStrike", complexity: "High" },
+            { name: "LinkFinder Forks", cat: "Recon", desc: "Endpoint discovery.", url: "https://github.com", complexity: "High" },
+            { name: "GitLeaks Advanced", cat: "Recon", desc: "Secret detection.", url: "https://github.com/zricethezav/gitleaks", complexity: "High" },
+            { name: "TruffleHog v3", cat: "Recon", desc: "Secret finder.", url: "https://github.com/trufflesecurity/trufflehog", complexity: "High" },
+            { name: "Repo-supervisor API", cat: "Recon", desc: "Repo scanner.", url: "https://github.com", complexity: "High" },
+            { name: "S3Scanner API", cat: "Recon", desc: "Bucket scanner.", url: "https://github.com/sa7mon/S3Scanner", complexity: "High" },
+            { name: "CloudEnum API", cat: "Recon", desc: "Cloud enum.", url: "https://github.com", complexity: "High" },
+            { name: "AzureHound", cat: "Recon", desc: "Azure recon.", url: "https://github.com", complexity: "High" },
+            { name: "GCPBucketBrute", cat: "Recon", desc: "GCP bucket brute.", url: "https://github.com", complexity: "High" },
+
+            // --- 50. MONITORING, ALERTS & INTELLIGENCE FEEDS ---
+            { name: "Feedly Pro+", cat: "SOCMINT", desc: "Pro feed aggregator.", url: "https://feedly.com", complexity: "Medium" },
+            { name: "Inoreader Pro", cat: "SOCMINT", desc: "Pro RSS reader.", url: "https://inoreader.com", complexity: "Medium" },
+            { name: "NewsBlur", cat: "SOCMINT", desc: "RSS reader.", url: "https://newsblur.com", complexity: "Low" },
+            { name: "Netvibes", cat: "SOCMINT", desc: "Dashboard monitoring.", url: "https://netvibes.com", complexity: "Medium" },
+            { name: "Flipboard Pro", cat: "SOCMINT", desc: "Content curation.", url: "https://flipboard.com", complexity: "Low" },
+            { name: "Google Alerts Advanced", cat: "SOCMINT", desc: "Alert system.", url: "https://google.com/alerts", complexity: "Low" },
+            { name: "Talkwalker Alerts Pro", cat: "SOCMINT", desc: "Pro alerts.", url: "https://talkwalker.com", complexity: "Medium" },
+            { name: "Mention Alerts Pro", cat: "SOCMINT", desc: "Brand monitoring.", url: "https://mention.com", complexity: "Medium" },
+            { name: "Meltwater Alerts Pro", cat: "SOCMINT", desc: "Media alerts.", url: "https://meltwater.com", complexity: "Medium" },
+            { name: "Dataminr First Alert", cat: "Threat Intel", desc: "Real-time alerts.", url: "https://dataminr.com", complexity: "High" },
+            { name: "GDELT API", cat: "Data Mining", desc: "Global events API.", url: "https://gdeltproject.org", complexity: "Medium" },
+            { name: "EventRegistry API", cat: "Data Mining", desc: "News events API.", url: "https://eventregistry.org", complexity: "Medium" },
+            { name: "AYLIEN News API", cat: "Data Mining", desc: "News analysis.", url: "https://aylien.com", complexity: "High" },
+            { name: "ContextualWeb News API", cat: "Data Mining", desc: "News API.", url: "https://contextualweb.io", complexity: "Medium" },
+            { name: "Diffbot API", cat: "Data Mining", desc: "Web extraction.", url: "https://diffbot.com", complexity: "High" },
+            { name: "Import.io API", cat: "Data Mining", desc: "Scraping API.", url: "https://import.io", complexity: "Medium" },
+            { name: "Scrapy Framework", cat: "Recon", desc: "Python scraper.", url: "https://scrapy.org", complexity: "High" },
+            { name: "BeautifulSoup", cat: "Recon", desc: "HTML parsing.", url: "https://beautiful-soup-4.readthedocs.io", complexity: "Medium" },
+            { name: "Selenium", cat: "Recon", desc: "Browser automation.", url: "https://selenium.dev", complexity: "High" },
+            { name: "Puppeteer", cat: "Recon", desc: "Chrome automation.", url: "https://pptr.dev", complexity: "High" },
+
+            // --- 51. FILE & DOCUMENT SEARCH ---
+            { name: "FilePursuit", cat: "Search", desc: "File search engine.", url: "https://filepursuit.com", complexity: "Low" },
+            { name: "FileSearch.link", cat: "Search", desc: "Indexed files.", url: "https://filesearch.link", complexity: "Low" },
+            { name: "AIO Search", cat: "Search", desc: "Multi-file search.", url: "https://aiosearch.com", complexity: "Low" },
+            { name: "MegaSearch", cat: "Search", desc: "MEGA files.", url: "https://megasearch.co", complexity: "Low" },
+            { name: "TorrentSeeker", cat: "Search", desc: "Torrent search.", url: "https://torrentseeker.com", complexity: "Low" },
+            { name: "BTDigg", cat: "Search", desc: "Torrent DHT search.", url: "https://btdigg.org", complexity: "Low" },
+            { name: "SolidTorrents", cat: "Search", desc: "Torrent search.", url: "https://solidtorrents.net", complexity: "Low" },
+            { name: "MagnetDL", cat: "Search", desc: "Magnet links.", url: "https://magnetdl.com", complexity: "Low" },
+            { name: "Scribd", cat: "Search", desc: "Document sharing.", url: "https://scribd.com", complexity: "Low" },
+            { name: "DocPlayer", cat: "Search", desc: "Presentation search.", url: "https://docplayer.net", complexity: "Low" },
+            { name: "PDFSearchEngine", cat: "Search", desc: "PDF search.", url: "https://pdfsearchengine.net", complexity: "Low" },
+            { name: "FreeFullPDF", cat: "Search", desc: "Academic PDFs.", url: "http://freefullpdf.com", complexity: "Low" },
+            { name: "SlideHunter", cat: "Search", desc: "Slide search.", url: "https://slidehunter.com", complexity: "Low" },
+            { name: "AuthorMapper", cat: "Search", desc: "Author search.", url: "https://authormapper.com", complexity: "Low" },
+            { name: "ConnectedPapers", cat: "Search", desc: "Research graph.", url: "https://connectedpapers.com", complexity: "Medium" },
+            { name: "Inciteful", cat: "Search", desc: "Research tool.", url: "https://inciteful.xyz", complexity: "Medium" },
+            { name: "Unpaywall", cat: "Search", desc: "Open access finder.", url: "https://unpaywall.org", complexity: "Low" },
+
+            // --- 52. IDENTITY, BACKGROUND & VERIFICATION ---
+            { name: "ID Analyzer", cat: "People", desc: "ID verification.", url: "https://idanalyzer.com", complexity: "Medium" },
+            { name: "Veriff", cat: "People", desc: "Identity validation.", url: "https://veriff.com", complexity: "Medium" },
+            { name: "Onfido", cat: "People", desc: "KYC verification.", url: "https://onfido.com", complexity: "High" },
+            { name: "Sumsub", cat: "People", desc: "Identity platform.", url: "https://sumsub.com", complexity: "Medium" },
+            { name: "Trulioo", cat: "People", desc: "Identity verification.", url: "https://trulioo.com", complexity: "Medium" },
+            { name: "Socure", cat: "People", desc: "Identity verification.", url: "https://socure.com", complexity: "Medium" },
+            { name: "Ekata", cat: "People", desc: "Identity risk.", url: "https://ekata.com", complexity: "Medium" },
+            { name: "SEON", cat: "People", desc: "Fraud detection.", url: "https://seon.io", complexity: "Medium" },
+            { name: "IPQS", cat: "Threat Intel", desc: "Fraud prevention.", url: "https://ipqualityscore.com", complexity: "Medium" },
+            { name: "FraudLabs", cat: "Threat Intel", desc: "Fraud detection.", url: "https://fraudlabspro.com", complexity: "Medium" },
+            { name: "PeopleLooker", cat: "People", desc: "People search.", url: "https://peoplelooker.com", complexity: "Low" },
+            { name: "Intelius", cat: "People", desc: "Background checks.", url: "https://intelius.com", complexity: "Medium" },
+            { name: "USSearch", cat: "People", desc: "People search.", url: "https://ussearch.com", complexity: "Low" },
+            { name: "CheckPeople", cat: "People", desc: "Background check.", url: "https://checkpeople.com", complexity: "Medium" },
+
+            // --- 53. EMAIL, CONTACT & LEAD INTELLIGENCE ---
+            { name: "LeadFuze", cat: "People", desc: "Lead generation.", url: "https://leadfuze.com", complexity: "Medium" },
+            { name: "UpLead", cat: "People", desc: "B2B leads.", url: "https://uplead.com", complexity: "Medium" },
+            { name: "FindEmails", cat: "Email", desc: "Email finder.", url: "https://findemails.com", complexity: "Low" },
+            { name: "Prospect.io", cat: "People", desc: "Outreach platform.", url: "https://prospect.io", complexity: "Medium" },
+            { name: "Reply.io", cat: "Email", desc: "Email outreach.", url: "https://reply.io", complexity: "Medium" },
+            { name: "Lemlist", cat: "Email", desc: "Cold email.", url: "https://lemlist.com", complexity: "Medium" },
+            { name: "Mailshake", cat: "Email", desc: "Email outreach.", url: "https://mailshake.com", complexity: "Medium" },
+            { name: "GMass", cat: "Email", desc: "Gmail outreach.", url: "https://gmass.co", complexity: "Low" },
+            { name: "Woodpecker", cat: "Email", desc: "Cold email.", url: "https://woodpecker.co", complexity: "Medium" },
+            { name: "SalesQL", cat: "Email", desc: "Sales automation.", url: "https://salesql.com", complexity: "Medium" },
+            { name: "Skrapp API", cat: "Email", desc: "Email API.", url: "https://skrapp.io", complexity: "Medium" },
+            { name: "Snov Leads", cat: "Email", desc: "Lead database.", url: "https://snov.io", complexity: "Low" },
+            { name: "Clearbit Prospector", cat: "People", desc: "B2B data.", url: "https://clearbit.com", complexity: "Medium" },
+            { name: "Hunter Campaigns", cat: "Email", desc: "Email campaigns.", url: "https://hunter.io", complexity: "Medium" },
+            { name: "RocketReach Advanced", cat: "People", desc: "Contact data.", url: "https://rocketreach.co", complexity: "Medium" },
+            { name: "Adapt Leads", cat: "People", desc: "Lead database.", url: "https://adapt.io", complexity: "Medium" },
+            { name: "SignalHire API", cat: "People", desc: "Talent API.", url: "https://signalhire.com", complexity: "Medium" },
+            { name: "Lusha Chrome", cat: "People", desc: "Chrome extension.", url: "https://lusha.com", complexity: "Low" },
+            { name: "Kaspr Chrome", cat: "People", desc: "Chrome extension.", url: "https://kaspr.io", complexity: "Low" },
+
+            // --- 54. DOMAIN, INFRA & EXPOSURE ---
+            { name: "URLCrazy", cat: "Domain", desc: "Typosquatting tool.", url: "https://github.com/urbanadventurer/urlcrazy", complexity: "High" },
+            { name: "DNSTwist", cat: "Domain", desc: "Domain permutation.", url: "https://github.com/elceef/dnstwist", complexity: "High" },
+            { name: "Subzy", cat: "Domain", desc: "Subdomain takeover.", url: "https://github.com/lukasikic/subzy", complexity: "High" },
+            { name: "Aquatone Screenshots", cat: "Recon", desc: "Visual recon.", url: "https://github.com/michenriksen/aquatone", complexity: "High" },
+            { name: "EyeWitness CLI", cat: "Recon", desc: "Screenshot tool.", url: "https://github.com/FortyNorthSecurity/EyeWitness", complexity: "High" },
+            { name: "Amass Passive", cat: "Domain", desc: "Passive recon.", url: "https://github.com/owasp-amass/amass", complexity: "High" },
+            { name: "Amass Active", cat: "Domain", desc: "Active recon.", url: "https://github.com/owasp-amass/amass", complexity: "High" },
+            { name: "Subfinder Pro", cat: "Domain", desc: "Pro subdomain.", url: "https://github.com/projectdiscovery/subfinder", complexity: "High" },
+            { name: "Assetfinder", cat: "Domain", desc: "Asset discovery.", url: "https://github.com/tomnomnom/assetfinder", complexity: "High" },
+            { name: "Findomain", cat: "Domain", desc: "Subdomain finder.", url: "https://findomain.app", complexity: "High" },
+            { name: "Chaos DB", cat: "Domain", desc: "Subdomain DB.", url: "https://chaos.projectdiscovery.io", complexity: "High" },
+            { name: "Haktrails", cat: "Domain", desc: "Subdomain trails.", url: "https://github.com/hakluke/haktrails", complexity: "High" },
+            { name: "WaybackURLs", cat: "Domain", desc: "Archive URLs.", url: "https://github.com/tomnomnom/waybackurls", complexity: "High" },
+            { name: "Gauplus", cat: "Domain", desc: "URL gatherer.", url: "https://github.com", complexity: "High" },
+            { name: "Katana Crawler Advanced", cat: "Recon", desc: "Advanced crawling.", url: "https://github.com/projectdiscovery/katana", complexity: "High" },
+            { name: "httpx Advanced", cat: "Recon", desc: "HTTP probing.", url: "https://github.com/projectdiscovery/httpx", complexity: "High" },
+            { name: "Naabu Scanner", cat: "Recon", desc: "Port scanner.", url: "https://github.com/projectdiscovery/naabu", complexity: "High" },
+            { name: "DNSGen", cat: "Domain", desc: "DNS generation.", url: "https://github.com/ProjectAnte/dnsgen", complexity: "High" },
+            { name: "ShuffleDNS", cat: "Domain", desc: "DNS bruteforce.", url: "https://github.com", complexity: "High" },
+            { name: "MassDNS", cat: "Domain", desc: "Mass DNS resolve.", url: "https://github.com", complexity: "High" },
+
+            // --- 55. SOCIAL MEDIA MONITORING & ANALYTICS ---
+            { name: "Social Searcher Pro", cat: "SOCMINT", desc: "Pro social search.", url: "https://social-searcher.com", complexity: "Medium" },
+            { name: "HypeAuditor API", cat: "SOCMINT", desc: "Influencer API.", url: "https://hypeauditor.com", complexity: "Medium" },
+            { name: "Heepsy API", cat: "SOCMINT", desc: "Influencer API.", url: "https://heepsy.com", complexity: "Medium" },
+            { name: "Modash API", cat: "SOCMINT", desc: "Influencer API.", url: "https://modash.io", complexity: "Medium" },
+            { name: "Analisa API", cat: "SOCMINT", desc: "Instagram API.", url: "https://analisa.io", complexity: "Medium" },
+            { name: "Exolyt API", cat: "SOCMINT", desc: "TikTok API.", url: "https://exolyt.com", complexity: "Medium" },
+            { name: "TikBuddy", cat: "SOCMINT", desc: "TikTok tool.", url: "https://tikbuddy.com", complexity: "Low" },
+            { name: "Pentos", cat: "SOCMINT", desc: "Social analytics.", url: "https://pentos.co", complexity: "Medium" },
+            { name: "SocialInsider", cat: "SOCMINT", desc: "Social analytics.", url: "https://socialinsider.io", complexity: "Medium" },
+            { name: "Metricool", cat: "SOCMINT", desc: "Social tool.", url: "https://metricool.com", complexity: "Low" },
+            { name: "Later Analytics Pro", cat: "SOCMINT", desc: "Pro analytics.", url: "https://later.com", complexity: "Medium" },
+            { name: "Buffer Analyze", cat: "SOCMINT", desc: "Analytics.", url: "https://buffer.com", complexity: "Low" },
+            { name: "Hootsuite Analytics", cat: "SOCMINT", desc: "Analytics platform.", url: "https://hootsuite.com", complexity: "Medium" },
+            { name: "Sprout Insights", cat: "SOCMINT", desc: "Social insights.", url: "https://sproutsocial.com", complexity: "Medium" },
+            { name: "Agorapulse Analytics", cat: "SOCMINT", desc: "Analytics.", url: "https://agorapulse.com", complexity: "Medium" },
+            { name: "CrowdTangle Dashboard", cat: "SOCMINT", desc: "Meta dashboard.", url: "https://crowdtangle.com", complexity: "Medium" },
+            { name: "TweetDeck Pro", cat: "SOCMINT", desc: "Twitter tool.", url: "https://tweetdeck.twitter.com", complexity: "Low" },
+            { name: "Discord Analytics Bots", cat: "SOCMINT", desc: "Server analytics.", url: "https://discord.com", complexity: "Medium" },
+            { name: "Telegram Analytics Bots", cat: "SOCMINT", desc: "Channel analytics.", url: "https://telegram.org", complexity: "Medium" },
+
+            // --- 56. IMAGE, VIDEO & DEEPFAKE DETECTION ---
+            { name: "Deepware Scanner App", cat: "Video", desc: "Desktop app.", url: "https://deepware.ai", complexity: "High" },
+            { name: "Sensity Enterprise", cat: "Video", desc: "Enterprise detection.", url: "https://sensity.ai", complexity: "High" },
+            { name: "Microsoft Deepfake Detector", cat: "Video", desc: "Video AI.", url: "https://azure.microsoft.com", complexity: "High" },
+            { name: "Hive Moderation", cat: "Images", desc: "Content moderation.", url: "https://thehive.ai", complexity: "High" },
+            { name: "Sightengine", cat: "Images", desc: "Moderation API.", url: "https://sightengine.com", complexity: "High" },
+            { name: "Clarifai", cat: "Images", desc: "Image recognition.", url: "https://clarifai.com", complexity: "High" },
+            { name: "Google Vision AI", cat: "Images", desc: "Image analysis.", url: "https://cloud.google.com/vision", complexity: "High" },
+            { name: "AWS Rekognition Advanced", cat: "Images", desc: "Advanced recognition.", url: "https://aws.amazon.com/rekognition", complexity: "High" },
+            { name: "Face++ Advanced", cat: "Images", desc: "Face API.", url: "https://faceplusplus.com", complexity: "High" },
+            { name: "Kairos Face Recognition", cat: "Images", desc: "Face API.", url: "https://kairos.com", complexity: "High" },
+            { name: "Luxand FaceSDK", cat: "Images", desc: "Face SDK.", url: "https://luxand.com", complexity: "High" },
+            { name: "Betaface", cat: "Images", desc: "Face recognition.", url: "https://betaface.com", complexity: "High" },
+            { name: "OpenBR", cat: "Images", desc: "Biometrics.", url: "https://openbiometrics.org", complexity: "High" },
+            { name: "Dlib Advanced", cat: "Images", desc: "ML toolkit.", url: "http://dlib.net", complexity: "High" },
+            { name: "InsightFace Advanced", cat: "Images", desc: "Face analysis.", url: "https://github.com/deepinsight/insightface", complexity: "High" },
+            { name: "DeepFace Advanced", cat: "Images", desc: "Python face.", url: "https://github.com/serengil/deepface", complexity: "High" },
+            { name: "MediaPipe Advanced", cat: "Images", desc: "Face detection.", url: "https://mediapipe.dev", complexity: "High" },
+            { name: "OpenCV Advanced", cat: "Images", desc: "CV library.", url: "https://opencv.org", complexity: "High" },
+            { name: "Video AI Tools", cat: "Video", desc: "Runway ML.", url: "https://runwayml.com", complexity: "High" },
+
+            // --- 57. GEOINT, TRACKING & MAPPING ---
+            { name: "Mapbox Studio", cat: "GEOINT", desc: "Custom maps.", url: "https://mapbox.com", complexity: "Medium" },
+            { name: "HERE Studio", cat: "GEOINT", desc: "Location platform.", url: "https://here.com", complexity: "Medium" },
+            { name: "ArcGIS Online", cat: "GEOINT", desc: "GIS platform.", url: "https://arcgis.com", complexity: "High" },
+            { name: "QGIS Plugins", cat: "GEOINT", desc: "GIS extensions.", url: "https://qgis.org", complexity: "Medium" },
+            { name: "Kepler.gl", cat: "GEOINT", desc: "Web mapping.", url: "https://kepler.gl", complexity: "Medium" },
+            { name: "Deck.gl", cat: "GEOINT", desc: "WebGL mapping.", url: "https://deck.gl", complexity: "High" },
+            { name: "Google Earth Studio", cat: "GEOINT", desc: "Earth creation.", url: "https://earth.google.com/studio", complexity: "Medium" },
+            { name: "CesiumJS", cat: "GEOINT", desc: "3D geospatial.", url: "https://cesium.com", complexity: "High" },
+            { name: "Sentinel Hub EO", cat: "GEOINT", desc: "Earth observation.", url: "https://sentinel-hub.com", complexity: "High" },
+            { name: "NASA Worldview Advanced", cat: "GEOINT", desc: "Satellite imagery.", url: "https://worldview.earthdata.nasa.gov", complexity: "Medium" },
+            { name: "FIRMS Fire Map", cat: "GEOINT", desc: "Fire data.", url: "https://firms.modaps.eosdis.nasa.gov", complexity: "Medium" },
+            { name: "Windy Pro", cat: "GEOINT", desc: "Weather pro.", url: "https://windy.com", complexity: "Medium" },
+            { name: "Ventusky Pro", cat: "GEOINT", desc: "Weather pro.", url: "https://ventusky.com", complexity: "Medium" },
+            { name: "RainViewer Pro", cat: "GEOINT", desc: "Radar pro.", url: "https://rainviewer.com", complexity: "Medium" },
+            { name: "ADS-B Exchange Advanced", cat: "GEOINT", desc: "Flight tracking.", url: "https://adsbexchange.com", complexity: "Medium" },
+            { name: "FlightAware Pro", cat: "GEOINT", desc: "Flight pro.", url: "https://flightaware.com", complexity: "Medium" },
+            { name: "MarineTraffic Pro", cat: "GEOINT", desc: "Maritime pro.", url: "https://marinetraffic.com", complexity: "Medium" },
+            { name: "VesselFinder Pro", cat: "GEOINT", desc: "Ship pro.", url: "https://vesselfinder.com", complexity: "Medium" },
+            { name: "OpenSky Pro", cat: "GEOINT", desc: "Aviation pro.", url: "https://opensky-network.org", complexity: "Medium" },
+            { name: "SkyVector Advanced", cat: "GEOINT", desc: "Aviation charts.", url: "https://skyvector.com", complexity: "Medium" },
+
+            // --- 58. DATA CORRELATION, AI & ANALYSIS ---
+            { name: "Neo4j Enterprise", cat: "Data Mining", desc: "Enterprise graph.", url: "https://neo4j.com", complexity: "High" },
+            { name: "TigerGraph Cloud", cat: "Data Mining", desc: "Graph cloud.", url: "https://tigergraph.com", complexity: "High" },
+            { name: "ArangoDB Enterprise", cat: "Data Mining", desc: "Enterprise DB.", url: "https://arangodb.com", complexity: "High" },
+            { name: "Graphistry Enterprise", cat: "Data Mining", desc: "Enterprise viz.", url: "https://graphistry.com", complexity: "High" },
+            { name: "Linkurious Enterprise", cat: "Data Mining", desc: "Enterprise graph.", url: "https://linkurious.com", complexity: "High" },
+            { name: "Maltego Enterprise", cat: "Data Mining", desc: "Enterprise OSINT.", url: "https://maltego.com", complexity: "High" },
+            { name: "IBM i2 Enterprise", cat: "Data Mining", desc: "Enterprise analysis.", url: "https://ibm.com/i2", complexity: "High" },
+            { name: "Palantir Gotham", cat: "Data Mining", desc: "Enterprise platform.", url: "https://palantir.com", complexity: "High" },
+            { name: "Palantir Foundry", cat: "Data Mining", desc: "Data platform.", url: "https://palantir.com", complexity: "High" },
+            { name: "Kumu Pro", cat: "Data Mining", desc: "Pro mapping.", url: "https://kumu.io", complexity: "Medium" },
+            { name: "Gephi Advanced", cat: "Data Mining", desc: "Advanced viz.", url: "https://gephi.org", complexity: "High" },
+            { name: "Cytoscape Advanced", cat: "Data Mining", desc: "Advanced network.", url: "https://cytoscape.org", complexity: "High" },
+            { name: "NetworkX Advanced", cat: "Data Mining", desc: "Advanced networking.", url: "https://networkx.org", complexity: "High" },
+            { name: "Pandas Pipelines", cat: "Data Mining", desc: "Data pipelines.", url: "https://pandas.pydata.org", complexity: "High" },
+            { name: "Scikit-learn Advanced", cat: "Data Mining", desc: "Advanced ML.", url: "https://scikit-learn.org", complexity: "High" },
+            { name: "TensorFlow Advanced", cat: "Data Mining", desc: "Advanced ML.", url: "https://tensorflow.org", complexity: "High" },
+            { name: "PyTorch Advanced", cat: "Data Mining", desc: "Advanced DL.", url: "https://pytorch.org", complexity: "High" },
+            { name: "HuggingFace Pipelines", cat: "Data Mining", desc: "NLP pipelines.", url: "https://huggingface.co", complexity: "High" },
+            { name: "LangChain Agents", cat: "Data Mining", desc: "AI agents.", url: "https://langchain.com", complexity: "High" },
+            { name: "Haystack Pipelines", cat: "Data Mining", desc: "NLP pipelines.", url: "https://haystack.deepset.ai", complexity: "High" },
+
+            // --- 59. RECON, CRAWLING & AUTOMATION ---
+            { name: "Scrapy", cat: "Recon", desc: "Python scraper.", url: "https://scrapy.org", complexity: "High" },
+            { name: "BeautifulSoup", cat: "Recon", desc: "HTML parsing.", url: "https://beautiful-soup-4.readthedocs.io", complexity: "Medium" },
+            { name: "Selenium", cat: "Recon", desc: "Browser automation.", url: "https://selenium.dev", complexity: "High" },
+            { name: "Puppeteer", cat: "Recon", desc: "Chrome automation.", url: "https://pptr.dev", complexity: "High" },
+            { name: "Playwright", cat: "Recon", desc: "Browser automation.", url: "https://playwright.dev", complexity: "High" },
+            { name: "Apify", cat: "Recon", desc: "Scraping platform.", url: "https://apify.com", complexity: "High" },
+            { name: "Octoparse", cat: "Recon", desc: "No-code scraper.", url: "https://octoparse.com", complexity: "Medium" },
+            { name: "ParseHub", cat: "Recon", desc: "Visual scraper.", url: "https://parsehub.com", complexity: "Medium" },
+            { name: "WebHarvy", cat: "Recon", desc: "Web scraper.", url: "https://webharvy.com", complexity: "Medium" },
+            { name: "Helium Scraper", cat: "Recon", desc: "Smart scraper.", url: "https://heliumscraper.com", complexity: "Medium" },
+            { name: "Dexi.io", cat: "Recon", desc: "Cloud scraper.", url: "https://dexi.io", complexity: "Medium" },
+            { name: "Mozenda", cat: "Recon", desc: "Scraping platform.", url: "https://mozenda.com", complexity: "Medium" },
+            { name: "Diffbot API", cat: "Recon", desc: "Web extraction.", url: "https://diffbot.com", complexity: "High" },
+            { name: "Import.io API", cat: "Recon", desc: "Scraping API.", url: "https://import.io", complexity: "Medium" },
+            { name: "Zyte", cat: "Recon", desc: "Scraping platform.", url: "https://zyte.com", complexity: "High" },
+            { name: "DataMiner Extension", cat: "Recon", desc: "Chrome extension.", url: "https://data-miner.io", complexity: "Low" },
+            { name: "WebScraper.io", cat: "Recon", desc: "Web scraper.", url: "https://webscraper.io", complexity: "Low" },
+            { name: "Browse AI", cat: "Recon", desc: "AI scraper.", url: "https://browse.ai", complexity: "Medium" },
+            { name: "PhantomBuster", cat: "Recon", desc: "Data extraction.", url: "https://phantombuster.com", complexity: "Medium" },
+            { name: "TexAu", cat: "Recon", desc: "Automation tool.", url: "https://texau.com", complexity: "Medium" },
+
+            // --- 60. MONITORING, ALERTS & INTELLIGENCE FEEDS ---
+            { name: "Feedly AI", cat: "SOCMINT", desc: "AI feed aggregator.", url: "https://feedly.com", complexity: "Medium" },
+            { name: "Inoreader AI", cat: "SOCMINT", desc: "AI RSS reader.", url: "https://inoreader.com", complexity: "Medium" },
+            { name: "Google Alerts Advanced", cat: "SOCMINT", desc: "Advanced alerts.", url: "https://google.com/alerts", complexity: "Low" },
+            { name: "Talkwalker Alerts Advanced", cat: "SOCMINT", desc: "Advanced monitoring.", url: "https://talkwalker.com", complexity: "Medium" },
+            { name: "Mention Alerts Advanced", cat: "SOCMINT", desc: "Advanced mentions.", url: "https://mention.com", complexity: "Medium" },
+            { name: "Meltwater Alerts", cat: "SOCMINT", desc: "Media alerts.", url: "https://meltwater.com", complexity: "Medium" },
+            { name: "Dataminr Pulse", cat: "Threat Intel", desc: "Real-time intel.", url: "https://dataminr.com", complexity: "High" },
+            { name: "NewsNow Aggregator", cat: "SOCMINT", desc: "News aggregation.", url: "https://newsnow.com", complexity: "Low" },
+            { name: "GDELT Advanced", cat: "Data Mining", desc: "Advanced GDELT.", url: "https://gdeltproject.org", complexity: "Medium" },
+            { name: "EventRegistry Advanced", cat: "Data Mining", desc: "Advanced events.", url: "https://eventregistry.org", complexity: "Medium" },
+            { name: "AYLIEN News API", cat: "Data Mining", desc: "News API.", url: "https://aylien.com", complexity: "High" },
+            { name: "ContextualWeb News API", cat: "Data Mining", desc: "News API.", url: "https://contextualweb.io", complexity: "Medium" },
+            { name: "Diffbot News API", cat: "Data Mining", desc: "News extraction.", url: "https://diffbot.com", complexity: "High" },
+            { name: "Import.io Scraping API", cat: "Data Mining", desc: "Scraping API.", url: "https://import.io", complexity: "Medium" },
+            { name: "ParseHub Automation", cat: "Data Mining", desc: "Automation.", url: "https://parsehub.com", complexity: "Medium" },
+            { name: "Apify Actors", cat: "Recon", desc: "Scraping actors.", url: "https://apify.com", complexity: "Medium" },
+            { name: "RSSHub", cat: "SOCMINT", desc: "RSS generator.", url: "https://docs.rsshub.app", complexity: "Medium" },
+            { name: "Huginn", cat: "Data Mining", desc: "Automation server.", url: "https://github.com/huginn/huginn", complexity: "High" },
+            { name: "n8n", cat: "Data Mining", desc: "Workflow automation.", url: "https://n8n.io", complexity: "Medium" },
+            { name: "Node-RED", cat: "Data Mining", desc: "Flow-based dev.", url: "https://nodered.org", complexity: "Medium" }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        const state = {
+            tools: osintTools,
+            activeCategory: 'all',
+            searchQuery: ''
+        };
+
+        // --- DOM ELEMENT REFERENCES ---
+        const toolsGrid = document.getElementById('toolsGrid');
+        const filterContainer = document.getElementById('categoryFilters');
+        const searchInput = document.getElementById('searchInput');
+        const toolCountLabel = document.getElementById('toolCount');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+        // --- INITIALIZATION ---
+        function init() {
+            renderFilters();
+            renderTools();
+            renderCharts();
+            setupEventListeners();
+        }
+
+        // --- RENDER LOGIC ---
+        function renderFilters() {
+            const categories = ['all', ...new Set(state.tools.map(t => t.cat))].sort();
+            
+            filterContainer.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = `category-btn px-4 py-2 rounded-full border border-[#00ff41]/30 text-sm font-medium transition-colors ${state.activeCategory === cat ? 'active bg-[#00ff41]/20 text-[#00ff41] border-[#00ff41]' : 'bg-black text-[#00ff41]/60 border-[#00ff41]/20 hover:bg-[#00ff41]/10 hover:text-[#00ff41]'}`;
+                btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+                btn.dataset.category = cat;
+                
+                btn.addEventListener('click', () => {
+                    state.activeCategory = cat;
+                    updateActiveFilterBtn();
+                    renderTools();
+                });
+                
+                filterContainer.appendChild(btn);
+            });
+        }
+
+        function updateActiveFilterBtn() {
+            const btns = document.querySelectorAll('.category-btn');
+            btns.forEach(btn => {
+                if(btn.dataset.category === state.activeCategory) {
+                    btn.classList.add('active', 'bg-[#00ff41]/20', 'text-[#00ff41]', 'border-[#00ff41]');
+                    btn.classList.remove('bg-black', 'text-[#00ff41]/60', 'hover:bg-[#00ff41]/10');
+                } else {
+                    btn.classList.remove('active', 'bg-[#00ff41]/20', 'text-[#00ff41]', 'border-[#00ff41]');
+                    btn.classList.add('bg-black', 'text-[#00ff41]/60', 'border-[#00ff41]/20', 'hover:bg-[#00ff41]/10', 'hover:text-[#00ff41]');
+                }
+            });
+        }
+
+        function renderTools() {
+            toolsGrid.innerHTML = '';
+            
+            const filtered = state.tools.filter(tool => {
+                const matchesCat = state.activeCategory === 'all' || tool.cat === state.activeCategory;
+                const matchesSearch = tool.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
+                                      tool.desc.toLowerCase().includes(state.searchQuery.toLowerCase());
+                return matchesCat && matchesSearch;
+            });
+
+            toolCountLabel.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                toolsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-[#00ff41]/40">
+                        <i class="fas fa-search-minus text-4xl mb-3"></i>
+                        <p>No tools found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = 'tool-card bg-black rounded-xl p-6 border border-[#00ff41]/20 flex flex-col justify-between h-full';
+                
+                let badgeColor = 'bg-[#00ff41]/10 text-[#00ff41] border border-[#00ff41]/30';
+                if (tool.complexity === 'Medium') badgeColor = 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30';
+                if (tool.complexity === 'High') badgeColor = 'bg-red-500/10 text-red-400 border border-red-500/30';
+
+                let iconClass = 'fa-tools';
+                if(tool.cat === 'SOCMINT') iconClass = 'fa-users';
+                if(tool.cat === 'GEOINT') iconClass = 'fa-globe-americas';
+                if(tool.cat === 'Email' || tool.cat === 'Phone' || tool.cat === 'People') iconClass = 'fa-id-card';
+                if(tool.cat === 'Domain' || tool.cat === 'Network') iconClass = 'fa-network-wired';
+                if(tool.cat === 'Images' || tool.cat === 'Files' || tool.cat === 'Video') iconClass = 'fa-image';
+                if(tool.cat === 'Search') iconClass = 'fa-search';
+                if(tool.cat === 'Threat Intel') iconClass = 'fa-shield-virus';
+                if(tool.cat === 'Business') iconClass = 'fa-building';
+                if(tool.cat === 'Crypto') iconClass = 'fa-coins';
+                if(tool.cat === 'Dark Web' || tool.cat === 'Breach') iconClass = 'fa-user-secret';
+                if(tool.cat === 'Recon' || tool.cat === 'Data Mining') iconClass = 'fa-cogs';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="bg-[#00ff41]/10 p-2 rounded-lg text-[#00ff41]">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-md ${badgeColor}">${tool.complexity}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-[#00ff41] mb-1">${tool.name}</h3>
+                        <div class="text-xs font-medium text-[#00ff41]/40 mb-3 uppercase tracking-wider">${tool.cat}</div>
+                        <p class="text-[#00ff41]/60 text-sm mb-6 leading-relaxed">${tool.desc}</p>
+                    </div>
+                    <a href="${tool.url}" target="_blank" class="block w-full text-center bg-[#00ff41]/5 hover:bg-[#00ff41]/20 text-[#00ff41] hover:text-[#00ff41] font-medium py-2 rounded-lg border border-[#00ff41]/30 transition-colors text-sm">
+                        Launch Tool <i class="fas fa-external-link-alt ml-1 text-xs opacity-50"></i>
+                    </a>
+                `;
+                toolsGrid.appendChild(card);
+            });
+        }
+
+        // --- VISUALIZATION LOGIC (Chart.js) ---
+        function renderCharts() {
+            const catCounts = {};
+            state.tools.forEach(t => { catCounts[t.cat] = (catCounts[t.cat] || 0) + 1; });
+            
+            const diffCounts = { 'Low': 0, 'Medium': 0, 'High': 0 };
+            state.tools.forEach(t => { diffCounts[t.complexity] = (diffCounts[t.complexity] || 0) + 1; });
+
+            // Category Distribution (Doughnut)
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctxCat, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catCounts),
+                    datasets: [{
+                        data: Object.values(catCounts),
+                        backgroundColor: [
+                            '#00ff41', '#00f0ff', '#ff00aa', '#00ff41', '#00f0ff', '#ff00aa', '#00ff41', '#00f0ff', '#ff00aa', '#00ff41', '#00f0ff', '#ff00aa'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { size: 10 }, color: '#00ff41' } }
+                    }
+                }
+            });
+
+            // Complexity (Bar)
+            const ctxDiff = document.getElementById('difficultyChart').getContext('2d');
+            new Chart(ctxDiff, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(diffCounts),
+                    datasets: [{
+                        label: 'Number of Tools',
+                        data: Object.values(diffCounts),
+                        backgroundColor: ['#00ff41', '#ffff00', '#ff0000'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#00ff41/20' }, ticks: { color: '#00ff41' } },
+                        x: { grid: { display: false }, ticks: { color: '#00ff41' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                renderTools();
+            });
+
+            mobileMenuBtn.addEventListener('click', () => {
+                const nav = document.querySelector('nav');
+                nav.classList.toggle('hidden');
+                nav.classList.toggle('flex');
+                nav.classList.toggle('flex-col');
+                nav.classList.toggle('absolute');
+                nav.classList.toggle('top-16');
+                nav.classList.toggle('left-0');
+                nav.classList.toggle('w-full');
+                nav.classList.toggle('bg-black');
+                nav.classList.toggle('border');
+                nav.classList.toggle('border-[#00ff41]/30');
+                nav.classList.toggle('p-4');
+            });
+        }
+
+        // Run App
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
