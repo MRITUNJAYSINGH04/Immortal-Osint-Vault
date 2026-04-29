@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMMORTAL_OSINTVAULT | Research & Intelligence Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1382,7 +1384,9 @@
         const state = {
             tools: osintTools,
             activeCategory: 'all',
-            searchQuery: ''
+            searchQuery: '',
+            currentPage: 1,
+            toolsPerPage: 48
         };
 
         // --- DOM ELEMENT REFERENCES ---
@@ -1414,6 +1418,7 @@
                 
                 btn.addEventListener('click', () => {
                     state.activeCategory = cat;
+                    state.currentPage = 1;
                     updateActiveFilterBtn();
                     renderTools();
                 });
@@ -1447,6 +1452,11 @@
 
             toolCountLabel.textContent = filtered.length;
 
+            // Pagination
+            const totalPages = Math.ceil(filtered.length / state.toolsPerPage);
+            const startIndex = (state.currentPage - 1) * state.toolsPerPage;
+            const paginatedTools = filtered.slice(startIndex, startIndex + state.toolsPerPage);
+
             if (filtered.length === 0) {
                 toolsGrid.innerHTML = `
                     <div class="col-span-full text-center py-12 text-[#00ff41]/40">
@@ -1457,7 +1467,7 @@
                 return;
             }
 
-            filtered.forEach(tool => {
+            paginatedTools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = 'tool-card bg-black rounded-xl p-6 border border-[#00ff41]/20 flex flex-col justify-between h-full';
                 
@@ -1496,6 +1506,32 @@
                 `;
                 toolsGrid.appendChild(card);
             });
+
+            // Add pagination controls
+            if (totalPages > 1) {
+                const paginationDiv = document.createElement('div');
+                paginationDiv.className = 'col-span-full flex justify-center items-center gap-2 mt-8';
+                
+                let paginationHTML = '';
+                if (state.currentPage > 1) {
+                    paginationHTML += `<button onclick="changePage(${state.currentPage - 1})" class="px-4 py-2 border border-[#00ff41]/30 text-[#00ff41] hover:bg-[#00ff41]/10 rounded-lg">&laquo; Prev</button>`;
+                }
+                
+                paginationHTML += `<span class="text-[#00ff41]/60 px-4">Page ${state.currentPage} of ${totalPages}</span>`;
+                
+                if (state.currentPage < totalPages) {
+                    paginationHTML += `<button onclick="changePage(${state.currentPage + 1})" class="px-4 py-2 border border-[#00ff41]/30 text-[#00ff41] hover:bg-[#00ff41]/10 rounded-lg">Next &raquo;</button>`;
+                }
+                
+                paginationDiv.innerHTML = paginationHTML;
+                toolsGrid.appendChild(paginationDiv);
+            }
+        }
+
+        function changePage(page) {
+            state.currentPage = page;
+            renderTools();
+            window.scrollTo({ top: document.getElementById('tools').offsetTop - 100, behavior: 'smooth' });
         }
 
         // --- VISUALIZATION LOGIC (Chart.js) ---
